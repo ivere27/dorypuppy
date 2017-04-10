@@ -19,6 +19,11 @@ add_library( # Sets the name of the library.
              # Provides a relative path to your source file(s).
              src/main/cpp/native-lib.cpp )
 
+set(prebuilt_DIR ${CMAKE_SOURCE_DIR}/libs)
+add_library(libuv STATIC IMPORTED)
+set_target_properties(libuv PROPERTIES IMPORTED_LOCATION
+    ${prebuilt_DIR}/${ANDROID_ABI}/libuv.a)
+
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by
 # default, you only need to specify the name of the public NDK library
@@ -36,8 +41,13 @@ find_library( # Sets the name of the path variable.
 # can link multiple libraries, such as libraries you define in this
 # build script, prebuilt third-party libraries, or system libraries.
 
+
+
+
 target_link_libraries( # Specifies the target library.
                        native-lib
+                       android
+                       libuv
 
                        # Links the target library to the log library
                        # included in the NDK.
