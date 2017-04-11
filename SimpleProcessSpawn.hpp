@@ -15,7 +15,6 @@ using namespace std;
 
 // Forward declaration
 class Error;
-class Response;
 class SimpleProcessSpawn;
 
 #if defined(NDEBUG)
@@ -30,24 +29,6 @@ using Callback = std::map<std::string, std::function<void(T...)>>;
 static uv_alloc_cb uvAllocCb = [](uv_handle_t* handle, size_t size, uv_buf_t* buf) {
   buf->base = (char*)malloc(size);
   buf->len = size;
-};
-
-// Error
-class Error {
-public:
-  Error(){};
-  Error(const char* name, const char* message) : name(name), message(message) {};
-  string name;
-  string message;
-};
-
-// Response
-class Response {
-public:
-  int64_t exitStatus;
-  int termSignal;
-  stringstream out;
-  stringstream err;
 };
 
 class SimpleProcessSpawn {
@@ -76,42 +57,64 @@ public:
       if (child->timer.loop == child->uv_loop) // which is initialized
         child->_clearTimer();
 
-      child->response.exitStatus = exit_status;
-      child->response.termSignal = term_signal;
-
       uv_close((uv_handle_t*) req, NULL);
       uv_close((uv_handle_t*)&child->pipeOut, [](uv_handle_t*){});
       uv_close((uv_handle_t*)&child->pipeErr, [](uv_handle_t*){});
 
-      child->emit("response");
+      child->emit("exit", exit_status, term_signal);
     };
 
     this->args = args;
     options.file = args[0];
     options.args = args;
   }
+
+  // FIXME : look ugly
+  // work around emit and on.
+  SimpleProcessSpawn& emit(const string name, int64_t exit_status, int term_signal) {
+    if (name.compare("exit") == 0 && exitCallback != nullptr)
+      exitCallback(exit_status, term_signal);
+    return *this;
+  }
+  SimpleProcessSpawn& emit(const string name, char* buf, ssize_t nread) {
+    if (name.compare("stdout") == 0 && stdoutCallback != nullptr)
+      stdoutCallback(buf, nread);
+    if (name.compare("stderr") == 0 && stderrCallback != nullptr)
+      stderrCallback(buf, nread);
+    return *this;
+  }
+  SimpleProcessSpawn& emit(const string name, const char* _name, const char* message) {
+    if (name.compare("error") == 0 && exitCallback != nullptr)
+      errorCallback(_name, message);
+    return *this;
+  }
+
   //FIXME : variadic ..Args using tuple.
   template <typename... Args>
-  SimpleProcessSpawn& emit(const string name, Args... args) {
-    if (name.compare("response") == 0 && responseCallback != nullptr)
-      responseCallback(std::forward<Response>(response));
-    else if (name.compare("error") == 0 && errorCallback != nullptr)
-      errorCallback(Error(args...));
-    else if (eventListeners.count(name))
+  SimpleProcessSpawn& emit(const string name, Args&&... args) {
+    if (eventListeners.count(name))
       eventListeners[name]();
 
     return *this;
   }
 
-  SimpleProcessSpawn& on(const string name, std::function<void(Response&&)> func) {
-    if (name.compare("response") == 0)
-      responseCallback = func;
+  SimpleProcessSpawn& on(const string name, std::function<void(const char*, const char*)> func) {
+    if (name.compare("error") == 0)
+      errorCallback = func;
 
     return *this;
   }
-  SimpleProcessSpawn& on(const string name, std::function<void(Error&&)> func) {
-    if (name.compare("error") == 0)
-      errorCallback = func;
+  SimpleProcessSpawn& on(const string name, std::function<void(int64_t,int)> func) {
+    if (name.compare("exit") == 0)
+      exitCallback = func;
+
+    return *this;
+  }
+  SimpleProcessSpawn& on(const string name, std::function<void(char*,ssize_t)> func) {
+    if (name.compare("stdout") == 0)
+      stdoutCallback = func;
+    else if (name.compare("stderr") == 0)
+        stderrCallback = func;
 
     return *this;
   }
@@ -154,7 +157,7 @@ public:
     r = uv_read_start((uv_stream_t*) &pipeOut, uvAllocCb, [](uv_stream_t* stream, ssize_t nread, const uv_buf_t* buf) {
       SimpleProcessSpawn *child = (SimpleProcessSpawn*)stream->data;
       if (nread > 0) {
-        child->response.out.rdbuf()->sputn(buf->base, nread);
+        child->emit("stdout", buf->base, nread);
       } else if (nread < 0) {
         assert(nread == UV_EOF);
       }
@@ -169,7 +172,7 @@ public:
     r = uv_read_start((uv_stream_t*) &pipeErr, uvAllocCb, [](uv_stream_t* stream, ssize_t nread, const uv_buf_t* buf) {
       SimpleProcessSpawn *child = (SimpleProcessSpawn*)stream->data;
       if (nread > 0) {
-        child->response.err.rdbuf()->sputn(buf->base, nread);
+        child->emit("stderr", buf->base, nread);
       } else if (nread < 0) {
         assert(nread == UV_EOF);
       }
@@ -181,7 +184,6 @@ public:
 
   }
 
-  Response response;
   unsigned int timeout = 0; // forever in defaults
 private:
   uv_loop_t* uv_loop;
@@ -194,8 +196,10 @@ private:
   uv_timer_t timer;
 
   Callback<> eventListeners;
-  std::function<void(Response&&)> responseCallback = nullptr;
-  std::function<void(Error&&)> errorCallback = nullptr;
+  std::function<void(const char*, const char*)> errorCallback = nullptr;
+  std::function<void(int64_t,int)> exitCallback = nullptr;
+  std::function<void(char*, ssize_t)> stdoutCallback = nullptr;
+  std::function<void(char*, ssize_t)> stderrCallback = nullptr;
 
   void _clearTimer() {
     if (!uv_is_closing((uv_handle_t*)&this->timer)) {

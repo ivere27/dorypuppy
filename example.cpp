@@ -12,16 +12,22 @@ int main() {
   args[2] = NULL;
 
   SimpleProcessSpawn process(uv_loop, args);
-  process.timeout = 1000;
-  process.on("error", [](Error &&error){
-    cout << error.name << endl;
-    cout << error.message << endl;
+  //process.timeout = 1000;
+  process.on("error", [](const char* name, const  char* message){
+    cout << name << endl;
+    cout << message << endl;
   })
-  .on("response", [](Response &&response){
-    cout << "exit code : " << response.exitStatus << endl;
-    cout << "signal : " << response.termSignal << endl;
-    cout << response.out.str();
-    cout << response.err.str();
+  .on("stdout", [](char* buf, ssize_t nread) {
+    for(int i=0;i<nread;i++)
+      printf("%c", buf[i]);
+  })
+  .on("stderr", [](char* buf, ssize_t nread) {
+    for(int i=0;i<nread;i++)
+      printf("%c", buf[i]);
+  })
+  .on("exit", [](int64_t exitStatus, int termSignal) {
+    cout << "exit code : " << exitStatus << endl;
+    cout << "signal : " << termSignal << endl;
   })
   .spawn();
 
