@@ -35,19 +35,25 @@ Java_io_tempage_dorypuppy_MainActivity_stringFromJNI(
         args[2] = NULL;
 
         SimpleProcessSpawn process(uv_loop, args);
-        process.timeout = 1000;
-        process.on("error", [](Error &&error) {
-            cout << error.name << endl;
-            cout << error.message << endl;
+        process.on("error", [](const char* name, const  char* message){
+            cout << name << endl;
+            cout << message << endl;
         })
-        .on("response", [&](Response &&response) {
-            cout << "exit code : " << response.exitStatus << endl;
-            cout << "signal : " << response.termSignal << endl;
-            cout << response.out.str();
-            cout << response.err.str();
+        .on("stdout", [&hello](char* buf, ssize_t nread) {
+            std::string str(buf, nread);
+            LOGI("%s", str.c_str());
 
-            hello = response.out.str();
-            LOGI("%s", hello.c_str());
+            hello += str;
+        })
+        .on("stderr", [&hello](char* buf, ssize_t nread) {
+            std::string str(buf, nread);
+            LOGI("%s", str.c_str());
+
+            hello += str;
+        })
+        .on("exit", [](int64_t exitStatus, int termSignal) {
+            cout << "exit code : " << exitStatus << endl;
+            cout << "signal : " << termSignal << endl;
         })
         .spawn();
 
