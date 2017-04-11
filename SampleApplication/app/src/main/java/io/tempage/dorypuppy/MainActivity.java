@@ -14,6 +14,7 @@ public class MainActivity extends AppCompatActivity {
 
     // Used to load the 'native-lib' library on application startup.
     static {
+        System.loadLibrary("uv");
         System.loadLibrary("native-lib");
     }
 

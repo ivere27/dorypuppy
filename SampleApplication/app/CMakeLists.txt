@@ -20,9 +20,9 @@ add_library( # Sets the name of the library.
              src/main/cpp/native-lib.cpp )
 
 set(prebuilt_DIR ${CMAKE_SOURCE_DIR}/libs)
-add_library(libuv STATIC IMPORTED)
+add_library(libuv SHARED IMPORTED)
 set_target_properties(libuv PROPERTIES IMPORTED_LOCATION
-    ${prebuilt_DIR}/${ANDROID_ABI}/libuv.a)
+    ${prebuilt_DIR}/${ANDROID_ABI}/libuv.so)
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by

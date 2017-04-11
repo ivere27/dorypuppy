@@ -47,6 +47,7 @@ Java_io_tempage_dorypuppy_MainActivity_stringFromJNI(
             cout << response.err.str();
 
             hello = response.out.str();
+            LOGI("%s", hello.c_str());
         })
         .spawn();
 
