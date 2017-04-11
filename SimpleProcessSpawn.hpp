@@ -1,10 +1,6 @@
 #ifndef SIMPLE_PROCESS_SPAWN_H_
 #define SIMPLE_PROCESS_SPAWN_H_
 
-#define SIMPLE_PROCESS_SPAWN_VERSION_MAJOR 0
-#define SIMPLE_PROCESS_SPAWN_VERSION_MINOR 1
-#define SIMPLE_PROCESS_SPAWN_VERSION_PATCH 0
-
 #include <cstdio>
 #include <cassert>
 #include <functional>
