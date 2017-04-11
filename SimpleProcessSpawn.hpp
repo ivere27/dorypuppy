@@ -14,7 +14,6 @@ namespace spawn {
 using namespace std;
 
 // Forward declaration
-class Error;
 class SimpleProcessSpawn;
 
 #if defined(NDEBUG)
@@ -34,7 +33,10 @@ static uv_alloc_cb uvAllocCb = [](uv_handle_t* handle, size_t size, uv_buf_t* bu
 class SimpleProcessSpawn {
 public:
   SimpleProcessSpawn(char** args) : SimpleProcessSpawn(uv_default_loop(), args) {}
-  SimpleProcessSpawn(uv_loop_t *loop, char** args) {
+  SimpleProcessSpawn(uv_loop_t *loop,
+                     char** args,
+                     const char* cwd = NULL,
+                     char** env = NULL) {
     this->uv_loop = loop;
     process.data = this;
     pipeOut.data = this;
@@ -51,6 +53,8 @@ public:
     options.stdio[2].flags = (uv_stdio_flags)(UV_CREATE_PIPE | UV_WRITABLE_PIPE);
     options.stdio[2].data.stream = (uv_stream_t*)&pipeErr;
     options.stdio_count = 3;
+    options.cwd = cwd;
+    options.env = env;
 
     options.exit_cb = [](uv_process_t *req, int64_t exit_status, int term_signal) {
       SimpleProcessSpawn *child = (SimpleProcessSpawn*)req->data;
