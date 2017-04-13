@@ -1,5 +1,5 @@
 #include <iostream>
-#include "SimpleProcessSpawn.hpp"
+#include "DoryProcessSpawn.hpp"
 
 using namespace std;
 using namespace spawn;
@@ -11,7 +11,7 @@ int main() {
   args[1] = (char*)"200";
   args[2] = NULL;
 
-  SimpleProcessSpawn process(uv_loop, args);
+  DoryProcessSpawn process(uv_loop, args);
   //process.timeout = 1000;
   process.on("error", [](const char* name, const  char* message){
     cout << name << endl;
