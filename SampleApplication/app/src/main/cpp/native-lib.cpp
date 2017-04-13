@@ -34,9 +34,9 @@ Java_io_tempage_dorypuppy_MainActivity_stringFromJNI(
     args[2] = NULL;
 
     DoryProcessSpawn process(uv_loop, args);
-    int r = process.on("error", [](const char* name, const  char* message){
-        cout << name << endl;
-        cout << message << endl;
+    //process.timeout = 10;
+    int r = process.on("timeout", []() {
+        LOGI("timeout fired");
     })
     .on("stdout", [&hello](char* buf, ssize_t nread) {
         std::string str(buf, nread);
@@ -51,14 +51,14 @@ Java_io_tempage_dorypuppy_MainActivity_stringFromJNI(
         hello += str;
     })
     .on("exit", [](int64_t exitStatus, int termSignal) {
-        cout << "exit code : " << exitStatus << endl;
-        cout << "signal : " << termSignal << endl;
+        LOGI("exit code : %lld , signal : %d", exitStatus, termSignal);
     })
     .spawn();
 
     // check the result of spawn()
-    if (r != 0)
-        cout << uv_err_name(r) << " " << uv_strerror(r) << endl;
+    if (r != 0) {
+        LOGI("%s %s", uv_err_name(r), uv_strerror(r));
+    }
 
     uv_run(uv_loop, UV_RUN_DEFAULT);
 

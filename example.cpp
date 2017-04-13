@@ -13,9 +13,8 @@ int main() {
 
   DoryProcessSpawn process(uv_loop, args);
   //process.timeout = 1000;
-  int r = process.on("error", [](const char* name, const  char* message){
-    cout << name << endl;
-    cout << message << endl;
+  int r = process.on("timeout", []() {
+    cout << "timeout fired" << endl;
   })
   .on("stdout", [](char* buf, ssize_t nread) {
     for(int i=0;i<nread;i++)

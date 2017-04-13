@@ -145,8 +145,7 @@ public:
 
         uv_process_kill(&child->process, SIGKILL);
 
-        int _err = -ETIMEDOUT;
-        child->emit("error", uv_err_name(_err), uv_strerror(_err));
+        child->emit("timeout");
       }, timeout, 0);
       ASSERT(r == 0);
     }
