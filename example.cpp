@@ -13,7 +13,7 @@ int main() {
 
   DoryProcessSpawn process(uv_loop, args);
   //process.timeout = 1000;
-  process.on("error", [](const char* name, const  char* message){
+  int r = process.on("error", [](const char* name, const  char* message){
     cout << name << endl;
     cout << message << endl;
   })
@@ -30,6 +30,10 @@ int main() {
     cout << "signal : " << termSignal << endl;
   })
   .spawn();
+
+  // check the result of spawn()
+  if (r != 0)
+    cout << uv_err_name(r) << " " << uv_strerror(r) << endl;
 
   return uv_run(uv_loop, UV_RUN_DEFAULT);
 }

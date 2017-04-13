@@ -133,7 +133,7 @@ public:
 
     return *this;
   }
-  void spawn() {
+  int spawn() {
     int r;
 
     if (timeout > 0) {
@@ -152,10 +152,8 @@ public:
     }
 
     r = uv_spawn(uv_loop, &process, &options);
-    if (r != 0) {
-      this->emit("error", uv_err_name(r), uv_strerror(r));
-      return;
-    }
+    if (r != 0) // spawn error.
+      return r;
 
     // stdout pipe
     r = uv_read_start((uv_stream_t*) &pipeOut, uvAllocCb, [](uv_stream_t* stream, ssize_t nread, const uv_buf_t* buf) {
@@ -166,11 +164,7 @@ public:
         assert(nread == UV_EOF);
       }
     });
-
-    if(r != 0) {
-      this->emit("error", uv_err_name(r), uv_strerror(r));
-      return;
-    }
+    assert(r == 0);
 
     // stderr pipe
     r = uv_read_start((uv_stream_t*) &pipeErr, uvAllocCb, [](uv_stream_t* stream, ssize_t nread, const uv_buf_t* buf) {
@@ -181,11 +175,10 @@ public:
         assert(nread == UV_EOF);
       }
     });
-    if(r != 0) {
-      this->emit("error", uv_err_name(r), uv_strerror(r));
-      return;
-    }
+    assert(r == 0);
 
+    // everything is ok
+    return 0;
   }
 
   unsigned int timeout = 0; // forever in defaults
