@@ -6,6 +6,18 @@ using namespace std;
 using namespace spawn;
 
 void loop(uv_loop_t* uv_loop) {
+  uv_timer_t timer;
+  int r;
+
+  r = uv_timer_init(uv_loop, &timer);
+  ASSERT(r==0);
+
+  // repeat every 1000 millisec to make the loop lives forever
+  // later, it will be used as whatdog.
+  r = uv_timer_start(&timer, [](uv_timer_t* timer){
+    cout << "in timer" << endl;
+  }, 0, 1000);
+  ASSERT(r == 0);
   uv_run(uv_loop, UV_RUN_DEFAULT);
 }
 
