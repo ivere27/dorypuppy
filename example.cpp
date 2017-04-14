@@ -1,8 +1,13 @@
 #include <iostream>
+#include <thread>
 #include "DoryProcessSpawn.hpp"
 
 using namespace std;
 using namespace spawn;
+
+void loop(uv_loop_t* uv_loop) {
+  uv_run(uv_loop, UV_RUN_DEFAULT);
+}
 
 int main() {
   uv_loop_t* uv_loop = uv_default_loop();
@@ -34,5 +39,8 @@ int main() {
   if (r != 0)
     cout << uv_err_name(r) << " " << uv_strerror(r) << endl;
 
-  return uv_run(uv_loop, UV_RUN_DEFAULT);
+  std::thread n(loop, uv_loop);
+  n.join();
+
+  return 0;
 }
