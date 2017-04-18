@@ -72,6 +72,8 @@ int main() {
     // check the result of spawn()
     if (r != 0)
       cout << uv_err_name(r) << " " << uv_strerror(r) << endl;
+    else
+      cout << "child pid : " << process->getPid() << endl;
   }
 
   return 0;

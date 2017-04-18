@@ -187,6 +187,10 @@ public:
     return 0;
   }
 
+  int getPid() {
+    return this->process.pid;
+  }
+
   unsigned int timeout = 0; // forever in defaults
 private:
   uv_loop_t* uv_loop;
