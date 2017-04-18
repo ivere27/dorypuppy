@@ -74,7 +74,7 @@ public:
   }
 
   DoryProcessSpawn& kill(int term_signal = 9) {
-    uv_process_kill(&process, SIGKILL);
+    uv_process_kill(&process, term_signal);
     return *this;
   }
 
