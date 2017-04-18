@@ -1,9 +1,15 @@
 #include <iostream>
+#include <stdlib.h>
+#include <time.h>
 #include <thread>
+#include <unistd.h>
 #include "DoryProcessSpawn.hpp"
 
 using namespace std;
 using namespace spawn;
+
+std::thread *n;
+uv_loop_t* uv_loop = uv_default_loop();
 
 void loop(uv_loop_t* uv_loop) {
   uv_timer_t timer;
@@ -22,37 +28,51 @@ void loop(uv_loop_t* uv_loop) {
 }
 
 int main() {
-  uv_loop_t* uv_loop = uv_default_loop();
-  char* args[3];
-  args[0] = (char*)"./child";
-  args[1] = (char*)"200";
-  args[2] = NULL;
+  //init
+  n = new std::thread(loop, uv_loop);
+  n->detach();
+  srand(time(NULL));
 
-  DoryProcessSpawn process(uv_loop, args);
-  //process.timeout = 1000;
-  int r = process.on("timeout", []() {
-    cout << "timeout fired" << endl;
-  })
-  .on("stdout", [](char* buf, ssize_t nread) {
-    for(int i=0;i<nread;i++)
-      printf("%c", buf[i]);
-  })
-  .on("stderr", [](char* buf, ssize_t nread) {
-    for(int i=0;i<nread;i++)
-      printf("%c", buf[i]);
-  })
-  .on("exit", [](int64_t exitStatus, int termSignal) {
-    cout << "exit code : " << exitStatus << endl;
-    cout << "signal : " << termSignal << endl;
-  })
-  .spawn();
+  int i=0;
+  while(1) {
+    i++;
 
-  // check the result of spawn()
-  if (r != 0)
-    cout << uv_err_name(r) << " " << uv_strerror(r) << endl;
+    if (i > 10) {
+      usleep(10*1000);
+      continue;
+    }
+    char buf[10];
+    sprintf(buf,"%i",rand()%10000);
 
-  std::thread n(loop, uv_loop);
-  n.join();
+    char* args[3];
+    args[0] = (char*)"./child";
+    args[1] = buf;  // (char*)"2000";
+    args[2] = NULL;
+
+    // FIXME : leak
+    DoryProcessSpawn *process = new DoryProcessSpawn(uv_loop, args);
+    //process.timeout = 1000;
+    int r = process->on("timeout", []() {
+      cout << "timeout fired" << endl;
+    })
+    .on("stdout", [](char* buf, ssize_t nread) {
+      for(int i=0;i<nread;i++)
+        printf("%c", buf[i]);
+    })
+    .on("stderr", [](char* buf, ssize_t nread) {
+      for(int i=0;i<nread;i++)
+        printf("%c", buf[i]);
+    })
+    .on("exit", [](int64_t exitStatus, int termSignal) {
+      cout << "exit code : " << exitStatus << endl;
+      cout << "signal : " << termSignal << endl;
+    })
+    .spawn();
+
+    // check the result of spawn()
+    if (r != 0)
+      cout << uv_err_name(r) << " " << uv_strerror(r) << endl;
+  }
 
   return 0;
 }
