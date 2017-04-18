@@ -73,6 +73,11 @@ public:
     options.args = args;
   }
 
+  DoryProcessSpawn& kill(int term_signal = 9) {
+    uv_process_kill(&process, SIGKILL);
+    return *this;
+  }
+
   // FIXME : look ugly
   // work around emit and on.
   DoryProcessSpawn& emit(const string name, int64_t exit_status, int term_signal) {
