@@ -1,4 +1,5 @@
 #include <iostream>
+#include <stdlib.h>
 #include <string>
 #include <unistd.h>
 
@@ -9,9 +10,8 @@ int main(int argc, char* argv[])
 
   cout << "CHILD - This is stdout" << endl;
   if (argc > 1) {
-    string t = argv[1];
-    cout << "usleep " << t << " * 1000" << endl;
-    usleep(stoi(t) * 1000);
+    cout << "usleep " << argv[1] << " * 1000" << endl;
+    usleep(strtol(argv[1],NULL,0) * 1000);
   }
 
   cerr << "CHILD - This is stderr" << endl;
