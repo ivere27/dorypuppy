@@ -163,7 +163,8 @@ public:
         assert(nread == UV_EOF);
       }
     });
-    assert(r == 0);
+    if (r != 0) // stdout pipe error.
+      return r;
 
     // stderr pipe
     r = uv_read_start((uv_stream_t*) &pipeErr, uvAllocCb, [](uv_stream_t* stream, ssize_t nread, const uv_buf_t* buf) {
@@ -174,7 +175,8 @@ public:
         assert(nread == UV_EOF);
       }
     });
-    assert(r == 0);
+    if (r != 0) // stderr pipe error.
+      return r;
 
     // everything is ok
     return 0;
