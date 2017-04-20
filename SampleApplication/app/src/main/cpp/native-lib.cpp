@@ -1,12 +1,14 @@
-#include <jni.h>
-#include <string>
 #include <cinttypes>
 #include <iostream>
+#include <stdlib.h>
+#include <string>
 #include <thread>
+#include <time.h>
 
 #include <android/log.h>
-#include "uv.h"
+#include <jni.h>
 
+#include "uv.h"
 #include "DoryProcessSpawn.hpp"
 
 using namespace std;
@@ -27,7 +29,7 @@ void loop(uv_loop_t* uv_loop) {
     ASSERT(r==0);
 
     // repeat every 1000 millisec to make the loop lives forever
-    // later, it will be used as whatdog.
+    // later, it will be used as watchdoc.
     r = uv_timer_start(&timer, [](uv_timer_t* timer){
         LOGI("in timer. process cout : %d", processList.size());
     }, 0, 1000);
@@ -39,6 +41,7 @@ extern "C"
 JNIEXPORT void JNICALL
 Java_io_tempage_dorypuppy_MainActivity_doryInit() {
     //init
+    srand(time(NULL));
     n = new std::thread(loop, uv_loop);
     n->detach();
 }
@@ -55,13 +58,12 @@ Java_io_tempage_dorypuppy_MainActivity_doryTest(
     err = uv_uptime(&uptime);
     LOGI("uv_uptime: %" PRIu64, uptime);
 
-    char *args[3];
+    char *args[2];
     args[0] = (char *) "/system/bin/top";
-    args[1] = NULL; //(char *) "/";
-    args[2] = NULL;
+    args[1] = NULL;
 
     DoryProcessSpawn *process = new DoryProcessSpawn(uv_loop, args);
-    //process.timeout = 10;
+    process->timeout = rand()%10000;
     int r = process->on("timeout", []() {
         LOGI("timeout fired");
     })

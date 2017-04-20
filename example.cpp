@@ -20,7 +20,7 @@ void loop(uv_loop_t* uv_loop) {
   ASSERT(r==0);
 
   // repeat every 1000 millisec to make the loop lives forever
-  // later, it will be used as whatdog.
+  // later, it will be used as whatchdog.
   r = uv_timer_start(&timer, [](uv_timer_t* timer){
     cout << "in timer. process cout : " << processList.size() << endl;
   }, 0, 1000);
