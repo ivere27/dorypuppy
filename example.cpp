@@ -10,6 +10,7 @@ using namespace spawn;
 
 std::thread *n;
 uv_loop_t* uv_loop = uv_default_loop();
+map<int, shared_ptr<DoryProcessSpawn>> processList;
 
 void loop(uv_loop_t* uv_loop) {
   uv_timer_t timer;
@@ -21,7 +22,7 @@ void loop(uv_loop_t* uv_loop) {
   // repeat every 1000 millisec to make the loop lives forever
   // later, it will be used as whatdog.
   r = uv_timer_start(&timer, [](uv_timer_t* timer){
-    cout << "in timer" << endl;
+    cout << "in timer. process cout : " << processList.size() << endl;
   }, 0, 1000);
   ASSERT(r == 0);
   uv_run(uv_loop, UV_RUN_DEFAULT);
@@ -63,17 +64,21 @@ int main() {
       for(int i=0;i<nread;i++)
         printf("%c", buf[i]);
     })
-    .on("exit", [](int64_t exitStatus, int termSignal) {
+    .on("exit", [process](int64_t exitStatus, int termSignal) {
       cout << "exit code : " << exitStatus << endl;
       cout << "signal : " << termSignal << endl;
+
+      processList.erase(process->getPid());
     })
     .spawn();
 
     // check the result of spawn()
     if (r != 0)
       cout << uv_err_name(r) << " " << uv_strerror(r) << endl;
-    else
+    else {
+      processList[process->getPid()] = std::make_shared<DoryProcessSpawn>(*process);
       cout << "child pid : " << process->getPid() << endl;
+    }
   }
 
   return 0;
