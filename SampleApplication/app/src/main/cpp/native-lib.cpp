@@ -17,6 +17,7 @@ using namespace spawn;
 
 std::thread *n;
 uv_loop_t* uv_loop = uv_default_loop();
+map<int, shared_ptr<DoryProcessSpawn>> processList;
 
 void loop(uv_loop_t* uv_loop) {
     uv_timer_t timer;
@@ -28,8 +29,7 @@ void loop(uv_loop_t* uv_loop) {
     // repeat every 1000 millisec to make the loop lives forever
     // later, it will be used as whatdog.
     r = uv_timer_start(&timer, [](uv_timer_t* timer){
-        LOGI("in timer");
-        cout << "in timer" << endl;
+        LOGI("in timer. process cout : %d", processList.size());
     }, 0, 1000);
     ASSERT(r == 0);
     uv_run(uv_loop, UV_RUN_DEFAULT);
@@ -43,13 +43,12 @@ Java_io_tempage_dorypuppy_MainActivity_doryInit() {
     n->detach();
 }
 
+
 extern "C"
-JNIEXPORT jstring JNICALL
-Java_io_tempage_dorypuppy_MainActivity_stringFromJNI(
+JNIEXPORT void JNICALL
+Java_io_tempage_dorypuppy_MainActivity_doryTest(
         JNIEnv *env,
         jobject /* this */) {
-
-    std::string hello = "Hello from C++";
 
     int err;
     double uptime;
@@ -57,8 +56,8 @@ Java_io_tempage_dorypuppy_MainActivity_stringFromJNI(
     LOGI("uv_uptime: %" PRIu64, uptime);
 
     char *args[3];
-    args[0] = (char *) "/system/bin/ls";
-    args[1] = (char *) "/";
+    args[0] = (char *) "/system/bin/top";
+    args[1] = NULL; //(char *) "/";
     args[2] = NULL;
 
     DoryProcessSpawn *process = new DoryProcessSpawn(uv_loop, args);
@@ -66,19 +65,16 @@ Java_io_tempage_dorypuppy_MainActivity_stringFromJNI(
     int r = process->on("timeout", []() {
         LOGI("timeout fired");
     })
-    .on("stdout", [&hello](char* buf, ssize_t nread) {
+    .on("stdout", [](char* buf, ssize_t nread) {
         std::string str(buf, nread);
         LOGI("%s", str.c_str());
-
-        hello += str;
     })
-    .on("stderr", [&hello](char* buf, ssize_t nread) {
+    .on("stderr", [](char* buf, ssize_t nread) {
         std::string str(buf, nread);
         LOGI("%s", str.c_str());
-
-        hello += str;
     })
-    .on("exit", [](int64_t exitStatus, int termSignal) {
+    .on("exit", [process](int64_t exitStatus, int termSignal) {
+        processList.erase(process->getPid());
         LOGI("exit code : %lld , signal : %d", exitStatus, termSignal);
     })
     .spawn();
@@ -87,18 +83,17 @@ Java_io_tempage_dorypuppy_MainActivity_stringFromJNI(
     if (r != 0) {
         LOGI("%s %s", uv_err_name(r), uv_strerror(r));
     } else {
+        processList[process->getPid()] = std::make_shared<DoryProcessSpawn>(*process);
         LOGI("child pid : %d", process->getPid());
     }
+}
 
-    // dumb loop to wait the process done
-    // FIXME : call JAVA's method
-    int i = 0;
-    while(1) {
-        i++;
-        usleep(100*1000);
-        if (i> 10)
-            break;
-    }
+extern "C"
+JNIEXPORT jstring JNICALL
+Java_io_tempage_dorypuppy_MainActivity_stringFromJNI(
+        JNIEnv *env,
+        jobject /* this */) {
+    std::string hello = "Hello from C++";
 
     return env->NewStringUTF(hello.c_str());
 }

@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                doryTest();
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
@@ -70,4 +71,5 @@ public class MainActivity extends AppCompatActivity {
      */
     public native String stringFromJNI();
     public native void doryInit();
+    public native void doryTest();
 }
