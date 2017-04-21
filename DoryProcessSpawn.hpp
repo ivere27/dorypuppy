@@ -168,8 +168,10 @@ public:
         assert(nread == UV_EOF);
       }
     });
-    if (r != 0) // stdout pipe error.
+    if (r != 0) { // stdout pipe error.
+      kill();
       return r;
+    }
 
     // stderr pipe
     r = uv_read_start((uv_stream_t*) &pipeErr, uvAllocCb, [](uv_stream_t* stream, ssize_t nread, const uv_buf_t* buf) {
@@ -180,8 +182,10 @@ public:
         assert(nread == UV_EOF);
       }
     });
-    if (r != 0) // stderr pipe error.
+    if (r != 0) { // stderr pipe error.
+      kill();
       return r;
+    }
 
     // everything is ok
     return 0;
