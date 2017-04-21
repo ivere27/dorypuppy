@@ -167,6 +167,7 @@ public:
       } else if (nread < 0) {
         assert(nread == UV_EOF);
       }
+      free(buf->base);
     });
     if (r != 0) { // stdout pipe error.
       kill();
@@ -181,6 +182,7 @@ public:
       } else if (nread < 0) {
         assert(nread == UV_EOF);
       }
+      free(buf->base);
     });
     if (r != 0) { // stderr pipe error.
       kill();
