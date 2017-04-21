@@ -63,7 +63,7 @@ Java_io_tempage_dorypuppy_MainActivity_doryTest(
     args[1] = NULL;
 
     DoryProcessSpawn *process = new DoryProcessSpawn(uv_loop, args);
-    process->timeout = rand()%10000;
+    process->timeout = rand()%(10*1000);
     int r = process->on("timeout", []() {
         LOGI("timeout fired");
     })

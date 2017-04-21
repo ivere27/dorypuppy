@@ -10,6 +10,9 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 public class MainActivity extends AppCompatActivity {
 
     // Used to load the 'native-lib' library on application startup.
@@ -17,6 +20,9 @@ public class MainActivity extends AppCompatActivity {
         System.loadLibrary("uv");
         System.loadLibrary("native-lib");
     }
+
+    private TimerTask mTask;
+    private Timer mTimer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,9 +48,17 @@ public class MainActivity extends AppCompatActivity {
         TextView tv = (TextView) findViewById(R.id.sample_text);
         tv.setText(stringFromJNI());
 
-        // child test
-        for (int i = 0; i<50;i ++)
-            doryTest();
+        mTask = new TimerTask() {
+            @Override
+            public void run() {
+                // child test
+                for (int i = 0; i<10; i++)
+                    doryTest();
+            }
+        };
+
+        mTimer = new Timer();
+        mTimer.schedule(mTask, 0, 10*1000);
     }
 
     @Override
