@@ -165,7 +165,9 @@ public:
       if (nread > 0) {
         child->emit("stdout", buf->base, nread);
       } else if (nread < 0) {
-        assert(nread == UV_EOF);
+        if (nread != UV_EOF)
+          child->kill(SIGTERM);
+        //assert(nread == UV_EOF);
       }
       free(buf->base);
     });
@@ -180,7 +182,9 @@ public:
       if (nread > 0) {
         child->emit("stderr", buf->base, nread);
       } else if (nread < 0) {
-        assert(nread == UV_EOF);
+        if (nread != UV_EOF)
+          child->kill(SIGTERM);
+        //assert(nread == UV_EOF);
       }
       free(buf->base);
     });
