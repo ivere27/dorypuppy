@@ -72,6 +72,9 @@ public:
     options.file = args[0];
     options.args = args;
   }
+  ~DoryProcessSpawn() {
+    eventListeners.clear();
+  }
 
   DoryProcessSpawn& kill(int term_signal = 9) {
     uv_process_kill(&process, term_signal);
