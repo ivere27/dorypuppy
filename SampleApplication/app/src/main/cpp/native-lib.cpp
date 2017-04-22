@@ -103,8 +103,15 @@ extern "C"
 JNIEXPORT jstring JNICALL
 Java_io_tempage_dorypuppy_MainActivity_stringFromJNI(
         JNIEnv *env,
-        jobject /* this */) {
+        jobject obj) {
     std::string hello = "Hello from C++";
+
+    JNIEnv *_env;
+    jint res = jvm->GetEnv((void**)&_env, JNI_VERSION_1_6);
+    jstring jstr = _env->NewStringUTF("JNI String Test");
+    jclass clazz = _env->FindClass("io/tempage/dorypuppy/MainActivity");
+    jmethodID testLog = _env->GetMethodID(clazz, "test", "(Ljava/lang/String;)V");
+    _env->CallVoidMethod(obj, testLog, jstr);
 
     return env->NewStringUTF(hello.c_str());
 }

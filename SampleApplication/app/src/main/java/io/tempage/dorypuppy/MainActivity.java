@@ -1,6 +1,7 @@
 package io.tempage.dorypuppy;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -78,6 +79,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void test(String s) {
+        Log.i("____________",s);
     }
 
     /**
