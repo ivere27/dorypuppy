@@ -89,6 +89,8 @@ Java_io_tempage_dorypuppy_MainActivity_doryTest(
         jvm->AttachCurrentThread(&env, NULL);
         jstring jstr = env->NewStringUTF(buf);
         env->CallVoidMethod(process->obj, process->testLog, jstr);
+        env->DeleteLocalRef(jstr);
+        jvm->DetachCurrentThread();
     })
     .on("stderr", [](char* buf, ssize_t nread) {
         std::string str(buf, nread);

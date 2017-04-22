@@ -83,6 +83,8 @@ public class MainActivity extends AppCompatActivity {
 
     public void test(String s) {
         Log.i("____________",s);
+//        TextView tv = (TextView) findViewById(R.id.sample_text);
+//        tv.setText(s);
     }
 
     /**
