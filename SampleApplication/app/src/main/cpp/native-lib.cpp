@@ -17,9 +17,11 @@ using namespace spawn;
 #define LOGI(...) \
   ((void)__android_log_print(ANDROID_LOG_INFO, "dorypuppy::", __VA_ARGS__))
 
-std::thread *n;
+std::thread *n = NULL;
 uv_loop_t* uv_loop = uv_default_loop();
 map<int, shared_ptr<DoryProcessSpawn>> processList;
+
+JavaVM *jvm;
 
 void loop(uv_loop_t* uv_loop) {
     uv_timer_t timer;
@@ -37,13 +39,20 @@ void loop(uv_loop_t* uv_loop) {
     uv_run(uv_loop, UV_RUN_DEFAULT);
 }
 
-extern "C"
-JNIEXPORT void JNICALL
-Java_io_tempage_dorypuppy_MainActivity_doryInit() {
+JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
+    JNIEnv* env;
+    jvm = vm;
+
+    if (vm->GetEnv((void**)&env, JNI_VERSION_1_6) != JNI_OK) {
+        return JNI_ERR;
+    }
+
     //init
     srand(time(NULL));
     n = new std::thread(loop, uv_loop);
     n->detach();
+
+    return JNI_VERSION_1_6;
 }
 
 
