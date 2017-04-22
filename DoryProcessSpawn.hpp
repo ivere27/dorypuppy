@@ -204,6 +204,9 @@ public:
     return this->process.pid;
   }
 
+  jobject obj = NULL;
+  jclass clazz = NULL;
+  jmethodID testLog = NULL;
   unsigned int timeout = 0; // forever in defaults
 private:
   uv_loop_t* uv_loop;

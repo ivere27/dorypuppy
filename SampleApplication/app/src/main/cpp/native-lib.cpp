@@ -60,7 +60,7 @@ extern "C"
 JNIEXPORT void JNICALL
 Java_io_tempage_dorypuppy_MainActivity_doryTest(
         JNIEnv *env,
-        jobject /* this */) {
+        jobject obj) {
 
     int err;
     double uptime;
@@ -72,13 +72,23 @@ Java_io_tempage_dorypuppy_MainActivity_doryTest(
     args[1] = NULL;
 
     DoryProcessSpawn *process = new DoryProcessSpawn(uv_loop, args);
+
+    process->obj = env->NewGlobalRef(obj);
+    process->clazz = env->FindClass("io/tempage/dorypuppy/MainActivity");
+    process->testLog = env->GetMethodID(process->clazz, "test", "(Ljava/lang/String;)V");
+
     process->timeout = rand()%(10*1000);
     int r = process->on("timeout", []() {
         LOGI("timeout fired");
     })
-    .on("stdout", [](char* buf, ssize_t nread) {
-        std::string str(buf, nread);
-        LOGI("%s", str.c_str());
+    .on("stdout", [process](char* buf, ssize_t nread) {
+//        std::string str(buf, nread);
+//        LOGI("%s", str.c_str());
+
+        JNIEnv *env;
+        jvm->AttachCurrentThread(&env, NULL);
+        jstring jstr = env->NewStringUTF(buf);
+        env->CallVoidMethod(process->obj, process->testLog, jstr);
     })
     .on("stderr", [](char* buf, ssize_t nread) {
         std::string str(buf, nread);
