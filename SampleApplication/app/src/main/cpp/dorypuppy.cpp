@@ -31,7 +31,7 @@ void loop(uv_loop_t* uv_loop) {
     ASSERT(r==0);
 
     // repeat every 1000 millisec to make the loop lives forever
-    // later, it will be used as watchdoc.
+    // later, it will be used as watchdog.
     r = uv_timer_start(&timer, [](uv_timer_t* timer){
         LOGI("in timer. process cout : %d", processList.size());
     }, 0, 1000);

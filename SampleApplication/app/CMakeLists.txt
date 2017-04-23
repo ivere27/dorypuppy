@@ -11,13 +11,13 @@ cmake_minimum_required(VERSION 3.4.1)
 # Gradle automatically packages shared libraries with your APK.
 
 add_library( # Sets the name of the library.
-             native-lib
+             dorypuppy
 
              # Sets the library as a shared library.
              SHARED
 
              # Provides a relative path to your source file(s).
-             src/main/cpp/native-lib.cpp )
+             src/main/cpp/dorypuppy.cpp )
 
 set(prebuilt_DIR ${CMAKE_SOURCE_DIR}/libs)
 add_library(libuv SHARED IMPORTED)
@@ -43,7 +43,7 @@ find_library( # Sets the name of the path variable.
 
 
 target_link_libraries( # Specifies the target library.
-                       native-lib
+                       dorypuppy
                        android
                        libuv
 
