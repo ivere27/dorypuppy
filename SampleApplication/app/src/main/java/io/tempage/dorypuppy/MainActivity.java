@@ -81,10 +81,28 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    public void test(byte[] array) {
+        final String s = new String(array);
+        Log.i("____________",s);
+
+        // we are in different thread.
+        // android.view.ViewRootImpl$CalledFromWrongThreadException: Only the original thread that created a view hierarchy can touch its views.
+        Thread thread= new Thread(){
+            @Override
+            public void run() {
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        TextView tv = (TextView) findViewById(R.id.sample_text);
+                        tv.setText(s);
+                    }
+                });
+            }
+        };
+        thread.start();
+    }
+
     public void test(String s) {
         Log.i("____________",s);
-//        TextView tv = (TextView) findViewById(R.id.sample_text);
-//        tv.setText(s);
     }
 
     /**

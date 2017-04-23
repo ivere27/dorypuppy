@@ -75,21 +75,24 @@ Java_io_tempage_dorypuppy_MainActivity_doryTest(
 
     process->obj = env->NewGlobalRef(obj);
     process->clazz = env->FindClass("io/tempage/dorypuppy/MainActivity");
-    process->testLog = env->GetMethodID(process->clazz, "test", "(Ljava/lang/String;)V");
+    process->testLog = env->GetMethodID(process->clazz, "test", "([B)V");
 
     process->timeout = rand()%(10*1000);
     int r = process->on("timeout", []() {
         LOGI("timeout fired");
     })
     .on("stdout", [process](char* buf, ssize_t nread) {
-//        std::string str(buf, nread);
-//        LOGI("%s", str.c_str());
+        //std::string str(buf, nread);
+        //LOGI("%s", str.c_str());
 
         JNIEnv *env;
         jvm->AttachCurrentThread(&env, NULL);
-        jstring jstr = env->NewStringUTF(buf);
-        env->CallVoidMethod(process->obj, process->testLog, jstr);
-        env->DeleteLocalRef(jstr);
+        jbyteArray array = env->NewByteArray(nread);
+
+        env->SetByteArrayRegion(array,0,nread,(jbyte*)buf);
+        env->CallVoidMethod(process->obj, process->testLog, array);
+
+        env->DeleteLocalRef(array);
         jvm->DetachCurrentThread();
     })
     .on("stderr", [](char* buf, ssize_t nread) {
