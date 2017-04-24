@@ -62,7 +62,12 @@ public:
         child->_clearTimer();
 
       uv_close((uv_handle_t*) req, NULL);
-      child->emit("exit", exit_status, term_signal);
+      child->exited = true;
+      child->term_signal = term_signal;
+      child->exit_status = exit_status;
+
+      if (child->stderrFlushed)
+        child->emit("exit", exit_status, term_signal);
     };
 
     this->args = args;
@@ -159,6 +164,9 @@ public:
     if (r != 0) // spawn error.
       return r;
 
+    // pid
+    pid = process.pid;
+
     // stdout pipe
     r = uv_read_start((uv_stream_t*) &pipeOut, uvAllocCb, [](uv_stream_t* stream, ssize_t nread, const uv_buf_t* buf) {
       DoryProcessSpawn *child = (DoryProcessSpawn*)stream->data;
@@ -187,7 +195,11 @@ public:
         if (nread != UV_EOF)
           child->kill(SIGTERM);
         //assert(nread == UV_EOF);
+
         uv_close((uv_handle_t*)&child->pipeErr, [](uv_handle_t*){});
+        child->stderrFlushed = true;
+        if (child->exited)
+          child->emit("exit", child->exit_status, child->term_signal);
       }
       free(buf->base);
     });
@@ -201,7 +213,7 @@ public:
   }
 
   int getPid() {
-    return this->process.pid;
+    return this->pid;
   }
 
   jobject obj = NULL;
@@ -217,6 +229,12 @@ private:
   uv_pipe_t pipeOut; // stdout
   uv_pipe_t pipeErr; // stderr
   uv_timer_t timer;
+
+  bool exited = false;
+  bool stderrFlushed = false;
+  int pid;
+  int64_t exit_status;
+  int term_signal;
 
   Callback<> eventListeners;
   std::function<void(const char*, const char*)> errorCallback = nullptr;
