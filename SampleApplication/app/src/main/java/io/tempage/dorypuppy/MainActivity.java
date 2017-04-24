@@ -110,5 +110,5 @@ public class MainActivity extends AppCompatActivity {
      * which is packaged with this application.
      */
     public native String stringFromJNI();
-    public native void doryTest();
+    public native int doryTest();
 }

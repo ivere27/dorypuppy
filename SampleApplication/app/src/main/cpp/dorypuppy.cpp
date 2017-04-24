@@ -57,7 +57,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
 
 
 extern "C"
-JNIEXPORT void JNICALL
+JNIEXPORT int JNICALL
 Java_io_tempage_dorypuppy_MainActivity_doryTest(
         JNIEnv *env,
         jobject obj) {
@@ -68,7 +68,7 @@ Java_io_tempage_dorypuppy_MainActivity_doryTest(
     LOGI("uv_uptime: %" PRIu64, uptime);
 
     char *args[2];
-    args[0] = (char *) "/system/bin/ls";
+    args[0] = (char *) "/system/bin/top";
     args[1] = NULL;
 
     DoryProcessSpawn *process = new DoryProcessSpawn(uv_loop, args);
@@ -108,10 +108,13 @@ Java_io_tempage_dorypuppy_MainActivity_doryTest(
     // check the result of spawn()
     if (r != 0) {
         LOGI("%s %s", uv_err_name(r), uv_strerror(r));
-    } else {
-        processList[process->getPid()] = std::make_shared<DoryProcessSpawn>(*process);
-        LOGI("child pid : %d", process->getPid());
+        return r;
     }
+
+    processList[process->getPid()] = std::make_shared<DoryProcessSpawn>(*process);
+    LOGI("child pid : %d", process->getPid());
+
+    return process->getPid();
 }
 
 extern "C"
