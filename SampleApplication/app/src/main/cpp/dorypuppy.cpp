@@ -22,10 +22,13 @@ uv_loop_t* uv_loop = uv_default_loop();
 map<int, shared_ptr<DoryProcessSpawn>> processList;
 
 JavaVM *jvm;
+JNIEnv *g_env;
 
 void loop(uv_loop_t* uv_loop) {
     uv_timer_t timer;
     int r;
+
+    jvm->AttachCurrentThread(&g_env, NULL);
 
     r = uv_timer_init(uv_loop, &timer);
     ASSERT(r==0);
@@ -37,6 +40,7 @@ void loop(uv_loop_t* uv_loop) {
     }, 0, 1000);
     ASSERT(r == 0);
     uv_run(uv_loop, UV_RUN_DEFAULT);
+    jvm->DetachCurrentThread();
 }
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
@@ -85,19 +89,19 @@ Java_io_tempage_dorypuppy_MainActivity_doryTest(
         //std::string str(buf, nread);
         //LOGI("%s", str.c_str());
 
-        JNIEnv *env;
-        jvm->AttachCurrentThread(&env, NULL);
-        jbyteArray array = env->NewByteArray(nread);
-
-        env->SetByteArrayRegion(array,0,nread,(jbyte*)buf);
-        env->CallVoidMethod(process->obj, process->testLog, array);
-
-        env->DeleteLocalRef(array);
-        jvm->DetachCurrentThread();
+        jbyteArray array = g_env->NewByteArray(nread);
+        g_env->SetByteArrayRegion(array,0,nread,(jbyte*)buf);
+        g_env->CallVoidMethod(process->obj, process->testLog, array);
+        g_env->DeleteLocalRef(array);
     })
-    .on("stderr", [](char* buf, ssize_t nread) {
-        std::string str(buf, nread);
-        LOGI("%s", str.c_str());
+    .on("stderr", [process](char* buf, ssize_t nread) {
+        // std::string str(buf, nread);
+        // LOGI("%s", str.c_str());
+
+        jbyteArray array = g_env->NewByteArray(nread);
+        g_env->SetByteArrayRegion(array,0,nread,(jbyte*)buf);
+        g_env->CallVoidMethod(process->obj, process->testLog, array);
+        g_env->DeleteLocalRef(array);
     })
     .on("exit", [process](int64_t exitStatus, int termSignal) {
         processList.erase(process->getPid());
