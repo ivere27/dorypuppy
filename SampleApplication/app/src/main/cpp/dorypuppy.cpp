@@ -14,8 +14,12 @@
 using namespace std;
 using namespace spawn;
 
+#ifdef NDEBUG
+#define LOGI(...)
+#else
 #define LOGI(...) \
   ((void)__android_log_print(ANDROID_LOG_INFO, "dorypuppy::", __VA_ARGS__))
+#endif
 
 std::thread *n = NULL;
 uv_loop_t* uv_loop = uv_default_loop();
