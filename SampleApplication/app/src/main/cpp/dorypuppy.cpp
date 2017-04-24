@@ -68,7 +68,7 @@ Java_io_tempage_dorypuppy_MainActivity_doryTest(
     LOGI("uv_uptime: %" PRIu64, uptime);
 
     char *args[2];
-    args[0] = (char *) "/system/bin/top";
+    args[0] = (char *) "/system/bin/ls";
     args[1] = NULL;
 
     DoryProcessSpawn *process = new DoryProcessSpawn(uv_loop, args);

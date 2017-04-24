@@ -62,9 +62,6 @@ public:
         child->_clearTimer();
 
       uv_close((uv_handle_t*) req, NULL);
-      uv_close((uv_handle_t*)&child->pipeOut, [](uv_handle_t*){});
-      uv_close((uv_handle_t*)&child->pipeErr, [](uv_handle_t*){});
-
       child->emit("exit", exit_status, term_signal);
     };
 
@@ -171,6 +168,8 @@ public:
         if (nread != UV_EOF)
           child->kill(SIGTERM);
         //assert(nread == UV_EOF);
+
+        uv_close((uv_handle_t*)&child->pipeOut, [](uv_handle_t*){});
       }
       free(buf->base);
     });
@@ -188,6 +187,7 @@ public:
         if (nread != UV_EOF)
           child->kill(SIGTERM);
         //assert(nread == UV_EOF);
+        uv_close((uv_handle_t*)&child->pipeErr, [](uv_handle_t*){});
       }
       free(buf->base);
     });
