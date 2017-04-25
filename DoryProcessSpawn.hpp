@@ -216,9 +216,12 @@ public:
     return this->pid;
   }
 
+#ifdef __ANDROID_API__
   jobject obj = NULL;
   jclass clazz = NULL;
   jmethodID testLog = NULL;
+#endif
+
   unsigned int timeout = 0; // forever in defaults
 private:
   uv_loop_t* uv_loop;
