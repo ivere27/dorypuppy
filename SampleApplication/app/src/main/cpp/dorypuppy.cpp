@@ -66,7 +66,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
 
 extern "C"
 JNIEXPORT int JNICALL
-Java_io_tempage_dorypuppy_MainActivity_doryTest(
+Java_io_tempage_dorypuppy_DoryPuppy_doryTest(
         JNIEnv *env,
         jobject obj) {
 
@@ -82,7 +82,7 @@ Java_io_tempage_dorypuppy_MainActivity_doryTest(
     DoryProcessSpawn *process = new DoryProcessSpawn(uv_loop, args);
 
     process->obj = env->NewGlobalRef(obj);
-    process->clazz = env->FindClass("io/tempage/dorypuppy/MainActivity");
+    process->clazz = env->FindClass("io/tempage/dorypuppy/DoryPuppy");
     process->testLog = env->GetMethodID(process->clazz, "test", "([B)V");
 
     process->timeout = rand()%(10*1000);
@@ -127,7 +127,7 @@ Java_io_tempage_dorypuppy_MainActivity_doryTest(
 
 extern "C"
 JNIEXPORT jstring JNICALL
-Java_io_tempage_dorypuppy_MainActivity_stringFromJNI(
+Java_io_tempage_dorypuppy_DoryPuppy_stringFromJNI(
         JNIEnv *env,
         jobject obj) {
     std::string hello = "Hello from C++";
@@ -135,7 +135,7 @@ Java_io_tempage_dorypuppy_MainActivity_stringFromJNI(
     JNIEnv *_env;
     jint res = jvm->GetEnv((void**)&_env, JNI_VERSION_1_6);
     jstring jstr = _env->NewStringUTF("JNI String Test");
-    jclass clazz = _env->FindClass("io/tempage/dorypuppy/MainActivity");
+    jclass clazz = _env->FindClass("io/tempage/dorypuppy/DoryPuppy");
     jmethodID testLog = _env->GetMethodID(clazz, "test", "(Ljava/lang/String;)V");
     _env->CallVoidMethod(obj, testLog, jstr);
 

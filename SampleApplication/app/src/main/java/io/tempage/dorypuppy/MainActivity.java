@@ -14,13 +14,10 @@ import android.view.MenuItem;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class MainActivity extends AppCompatActivity {
+import io.tempage.dorypuppy.DoryPuppy;
 
-    // Used to load the 'dorypuppy' library on application startup.
-    static {
-        System.loadLibrary("uv");
-        System.loadLibrary("dorypuppy");
-    }
+public class MainActivity extends AppCompatActivity {
+    private static final DoryPuppy doryPuppy =  DoryPuppy.getInstance();
 
     private TimerTask mTask;
     private Timer mTimer;
@@ -36,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                doryTest();
+                doryPuppy.doryTest();
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
@@ -44,14 +41,14 @@ public class MainActivity extends AppCompatActivity {
 
         // Example of a call to a native method
         TextView tv = (TextView) findViewById(R.id.sample_text);
-        tv.setText(stringFromJNI());
+        tv.setText(doryPuppy.stringFromJNI());
 
         mTask = new TimerTask() {
             @Override
             public void run() {
                 // child test
                 for (int i = 0; i<10; i++)
-                    doryTest();
+                    doryPuppy.doryTest();
             }
         };
 
@@ -81,34 +78,5 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void test(byte[] array) {
-        final String s = new String(array);
-        Log.i("____________",s);
 
-        // we are in different thread.
-        // android.view.ViewRootImpl$CalledFromWrongThreadException: Only the original thread that created a view hierarchy can touch its views.
-        Thread thread= new Thread(){
-            @Override
-            public void run() {
-                runOnUiThread(new Runnable() {
-                    public void run() {
-                        TextView tv = (TextView) findViewById(R.id.sample_text);
-                        tv.setText(s);
-                    }
-                });
-            }
-        };
-        thread.start();
-    }
-
-    public void test(String s) {
-        Log.i("____________",s);
-    }
-
-    /**
-     * A native method that is implemented by the 'dorypuppy' native library,
-     * which is packaged with this application.
-     */
-    public native String stringFromJNI();
-    public native int doryTest();
 }
