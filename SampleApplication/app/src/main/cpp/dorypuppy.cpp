@@ -76,7 +76,8 @@ Java_io_tempage_dorypuppy_DoryPuppy_doryTest(
     LOGI("uv_uptime: %" PRIu64, uptime);
 
     char *args[2];
-    args[0] = (char *) "/system/bin/top";
+    args[0] = (char *) "/system/bin/top"; //top or cal
+    //args[1] = (char *) "/system/bin/";
     args[1] = NULL;
 
     DoryProcessSpawn *process = new DoryProcessSpawn(uv_loop, args);
@@ -108,8 +109,8 @@ Java_io_tempage_dorypuppy_DoryPuppy_doryTest(
         g_env->DeleteLocalRef(array);
     })
     .on("exit", [process](int64_t exitStatus, int termSignal) {
+        LOGI("pid : %d, exit code : %lld , signal : %d", process->getPid(), exitStatus, termSignal);
         processList.erase(process->getPid());
-        LOGI("exit code : %lld , signal : %d", exitStatus, termSignal);
     })
     .spawn();
 

@@ -1,0 +1,124 @@
+package io.tempage.dorypuppy;
+
+import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.database.sqlite.SQLiteDatabase;
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
+import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
+
+import java.util.ArrayList;
+
+public class MessengerService extends Service {
+    private static final String TAG = "DORY";
+
+    ArrayList<Messenger> mClients = new ArrayList<Messenger>();
+
+    static final int MSG_REGISTER_CLIENT = 1;
+    static final int MSG_UNREGISTER_CLIENT = 2;
+
+    static final int MSG_SET_VALUE = 3;
+    static final int MSG_INIT = 4;
+    static final int MSG_STDOUT = 5;
+
+    private static final DoryPuppy doryPuppy =  DoryPuppy.getInstance();
+    Thread thread = null;
+
+    class IncomingHandler extends Handler {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case MSG_REGISTER_CLIENT:
+                    mClients.add(msg.replyTo);
+                    broadcastServiceStatus();
+                    break;
+                case MSG_UNREGISTER_CLIENT:
+                    mClients.remove(msg.replyTo);
+                    broadcastServiceStatus();
+                    break;
+                default:
+                    super.handleMessage(msg);
+            }
+        }
+    }
+
+    private void broadcastServiceStatus() {
+        Intent brocastIntent = new Intent("responseServiceStatus");
+        brocastIntent.putExtra("status", true);
+        LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(brocastIntent);
+    }
+
+
+    final Messenger mMessenger = new Messenger(new IncomingHandler());
+
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals("start")) {
+                thread = new Thread() {
+                    @Override
+                    public void run() {
+                        try {
+                            while(true) {
+                                for (int i = 0; i<10; i++)
+                                    doryPuppy.doryTest();
+
+                                sleep(10*1000);
+                            }
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                };
+                thread.start();
+                return;
+            }
+            if (intent.getAction().equals("stop")) {
+                thread.interrupt();;
+
+                stopSelf();
+                return;
+            }
+        }
+    };
+
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        if (null == intent) {
+            Log.e (TAG, "intent was null, flags=" + flags + " bits=" + Integer.toBinaryString (flags));
+            return START_STICKY;
+        }
+
+        return START_NOT_STICKY; //START_STICKY
+    }
+
+    @Override
+    public void onCreate() {
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("start");
+        filter.addAction("stop");
+        LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, filter);
+    }
+
+    @Override
+    public void onDestroy() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
+    }
+
+    @Override
+    public IBinder onBind(Intent intent) {
+        return mMessenger.getBinder();
+    }
+
+    @Override
+    public boolean onUnbind(Intent intent) {
+        return super.onUnbind(intent);
+    }
+}

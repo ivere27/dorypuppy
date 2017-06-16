@@ -21,6 +21,8 @@ public class DoryPuppy {
         return Singleton.instance;
     }
 
+
+
     public void test(byte[] array) {
         final String s = new String(array);
         Log.i("____________",s);
