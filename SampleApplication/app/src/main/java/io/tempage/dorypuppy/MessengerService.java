@@ -10,6 +10,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
+import android.os.StrictMode;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -95,12 +96,26 @@ public class MessengerService extends Service {
             Log.e (TAG, "intent was null, flags=" + flags + " bits=" + Integer.toBinaryString (flags));
             return START_STICKY;
         }
-
         return START_NOT_STICKY; //START_STICKY
     }
 
     @Override
     public void onCreate() {
+        if (BuildConfig.DEBUG) {
+            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                    .detectAll()
+                    .penaltyLog()
+                    .penaltyDropBox()
+                    .penaltyDialog()
+                    .build());
+            StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+                    .detectAll()
+                    .penaltyLog()
+                    .penaltyDropBox()
+                    //.penaltyDeath()
+                    .build());
+        }
+
         IntentFilter filter = new IntentFilter();
         filter.addAction("start");
         filter.addAction("stop");
