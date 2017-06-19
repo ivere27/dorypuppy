@@ -1,5 +1,7 @@
 package io.tempage.dorypuppy;
 
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -62,22 +64,6 @@ public class MessengerService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals("start")) {
-                thread = new Thread() {
-                    @Override
-                    public void run() {
-                        try {
-                            while(true) {
-                                for (int i = 0; i<10; i++)
-                                    doryPuppy.doryTest();
-
-                                sleep(10*1000);
-                            }
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                };
-                thread.start();
                 return;
             }
             if (intent.getAction().equals("stop")) {
@@ -88,6 +74,37 @@ public class MessengerService extends Service {
             }
         }
     };
+
+    public void doTest() {
+
+        Intent notificationIntent = new Intent(this, MainActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+
+        Notification notification = new Notification.Builder(this)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentTitle("dorypuppy")
+                .setContentText("puppy is running")
+                .setContentIntent(pendingIntent)
+                .build();
+        startForeground(1, notification);
+
+        thread = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    while(true) {
+                        for (int i = 0; i<50; i++)
+                            doryPuppy.doryTest();
+
+                        sleep(10*1000);
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        thread.start();
+    }
 
 
     @Override
@@ -120,6 +137,9 @@ public class MessengerService extends Service {
         filter.addAction("start");
         filter.addAction("stop");
         LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver, filter);
+
+        doTest();
+
     }
 
     @Override

@@ -20,7 +20,7 @@
             </intent-filter>
         </activity>
 
-        <service android:name="io.tempage.dorypuppy.MessengerService"  />
+        <service android:name="io.tempage.dorypuppy.MessengerService"  android:process=":externalProcess" />
     </application>
 
 </manifest>

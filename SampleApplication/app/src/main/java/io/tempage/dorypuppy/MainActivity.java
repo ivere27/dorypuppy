@@ -68,9 +68,6 @@ public class MainActivity extends AppCompatActivity {
                         MessengerService.MSG_SET_VALUE, this.hashCode(), 0);
                 mService.send(msg);
 
-                // start test
-                Intent brocastIntent = new Intent("start");
-                LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(brocastIntent);
             } catch (RemoteException e) {
             }
 
@@ -110,6 +107,10 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // start test
+                Intent brocastIntent = new Intent("start");
+                LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(brocastIntent);
+
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
@@ -135,10 +136,15 @@ public class MainActivity extends AppCompatActivity {
                     msg.replyTo = mMessenger;
                     mService.send(msg);
                 } catch (RemoteException e) {
+                    e.printStackTrace();
                 }
             }
 
-            unbindService(mConnection);
+            try {
+                unbindService(mConnection);
+            } catch (Exception e){
+                e.printStackTrace();
+            }
             mIsBound = false;
         }
 

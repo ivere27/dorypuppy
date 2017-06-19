@@ -27,6 +27,7 @@ map<int, shared_ptr<DoryProcessSpawn>> processList;
 
 JavaVM *jvm;
 JNIEnv *g_env;
+unsigned long long processIndex = 0;
 
 void loop(uv_loop_t* uv_loop) {
     uv_timer_t timer;
@@ -76,7 +77,7 @@ Java_io_tempage_dorypuppy_DoryPuppy_doryTest(
     LOGI("uv_uptime: %" PRIu64, uptime);
 
     char *args[2];
-    args[0] = (char *) "/system/bin/top"; //top or cal
+    args[0] = (char *) "/system/bin/top"; //top or cal or vmstat
     //args[1] = (char *) "/system/bin/";
     args[1] = NULL;
 
@@ -113,6 +114,8 @@ Java_io_tempage_dorypuppy_DoryPuppy_doryTest(
         processList.erase(process->getPid());
     })
     .spawn();
+    processIndex++;
+    LOGI("************** process index : %lld", processIndex);
 
     // check the result of spawn()
     if (r != 0) {
