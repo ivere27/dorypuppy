@@ -93,10 +93,10 @@ public class MessengerService extends Service {
             public void run() {
                 try {
                     while(true) {
-                        for (int i = 0; i<50; i++)
+                        for (int i = 0; i<20; i++)
                             doryPuppy.doryTest();
 
-                        sleep(10*1000);
+                        sleep(10*1000*10);
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();

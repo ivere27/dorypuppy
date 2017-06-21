@@ -77,7 +77,11 @@ Java_io_tempage_dorypuppy_DoryPuppy_doryTest(
     LOGI("uv_uptime: %" PRIu64, uptime);
 
     char *args[2];
-    args[0] = (char *) "/system/bin/top"; //top or cal or vmstat
+
+//    if (rand()%2 == 0)
+        args[0] = (char *) "/system/bin/top"; //top or cal or vmstat
+//    else
+//        args[0] = (char *) "/system/bin/cal"; //top or cal or vmstat
     //args[1] = (char *) "/system/bin/";
     args[1] = NULL;
 
@@ -87,7 +91,7 @@ Java_io_tempage_dorypuppy_DoryPuppy_doryTest(
     process->clazz = env->FindClass("io/tempage/dorypuppy/DoryPuppy");
     process->testLog = env->GetMethodID(process->clazz, "test", "([B)V");
 
-    process->timeout = rand()%(10*1000);
+    process->timeout = rand()%(10*1000*10);
     int r = process->on("timeout", []() {
         LOGI("timeout fired");
     })
