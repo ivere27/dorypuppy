@@ -78,11 +78,8 @@ Java_io_tempage_dorypuppy_DoryPuppy_doryTest(
 
     char *args[2];
 
-//    if (rand()%2 == 0)
-        args[0] = (char *) "/system/bin/top"; //top or cal or vmstat
-//    else
-//        args[0] = (char *) "/system/bin/cal"; //top or cal or vmstat
-    //args[1] = (char *) "/system/bin/";
+    // cal or vmstat : possibly StrictMode error
+    args[0] = (char *) "/system/bin/top";
     args[1] = NULL;
 
     DoryProcessSpawn *process = new DoryProcessSpawn(uv_loop, args);
