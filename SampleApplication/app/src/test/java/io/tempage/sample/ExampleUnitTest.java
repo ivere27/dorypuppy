@@ -1,4 +1,4 @@
-package io.tempage.dorypuppy;
+package io.tempage.sample;
 
 import org.junit.Test;
 

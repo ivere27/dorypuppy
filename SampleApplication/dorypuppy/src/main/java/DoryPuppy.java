@@ -1,7 +1,6 @@
 package io.tempage.dorypuppy;
 
 import android.util.Log;
-import android.widget.TextView;
 
 public class DoryPuppy {
     static {

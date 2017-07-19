@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="io.tempage.dorypuppy">
+    package="io.tempage.sample">
 
     <application
         android:allowBackup="true"
@@ -20,7 +20,7 @@
             </intent-filter>
         </activity>
 
-        <service android:name="io.tempage.dorypuppy.MessengerService"  android:process=":externalProcess" />
+        <service android:name="io.tempage.sample.MessengerService"  android:process=":externalProcess" />
     </application>
 
 </manifest>

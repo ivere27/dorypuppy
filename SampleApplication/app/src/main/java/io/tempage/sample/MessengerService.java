@@ -1,4 +1,4 @@
-package io.tempage.dorypuppy;
+package io.tempage.sample;
 
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -7,7 +7,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -17,6 +16,8 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import java.util.ArrayList;
+
+import io.tempage.dorypuppy.DoryPuppy;
 
 public class MessengerService extends Service {
     private static final String TAG = "DORY";

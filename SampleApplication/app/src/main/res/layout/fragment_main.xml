@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="io.tempage.dorypuppy.MainActivityFragment"
+    tools:context="io.tempage.sample.MainActivityFragment"
     tools:showIn="@layout/activity_main">
 
     <TextView

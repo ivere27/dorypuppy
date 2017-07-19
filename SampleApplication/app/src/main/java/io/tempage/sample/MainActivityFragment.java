@@ -1,4 +1,4 @@
-package io.tempage.dorypuppy;
+package io.tempage.sample;
 
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
