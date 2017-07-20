@@ -42,3 +42,6 @@ captures/
 example
 child
 *.o
+
+.DS_Store
+libuv.1.dylib
