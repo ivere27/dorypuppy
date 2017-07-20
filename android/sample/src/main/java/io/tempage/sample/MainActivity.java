@@ -22,6 +22,7 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import java.io.File;
 import java.io.IOException;
 
 import io.tempage.dorypuppy.DoryProcess;
@@ -117,7 +118,8 @@ public class MainActivity extends AppCompatActivity {
                 // cal or vmstat : possibly StrictMode error // args[0] = (char *) "/system/bin/top";
                 // to test stderr :  /system/bin/cat / -> /system/bin/sh: cat: /: Is a directory
                 // to test timeout : /system/bin/top  with p.start(1000*5);
-                DoryProcess p = new DoryProcess("/system/bin/top");
+                DoryProcess p = new DoryProcess("/system/bin/ls");
+                p.directory(new File("/system/f"));
                 try {
                     final int pid = p.start(1000*5);
                     p.setOnExitListener(new DoryPuppy.ExitListener() {

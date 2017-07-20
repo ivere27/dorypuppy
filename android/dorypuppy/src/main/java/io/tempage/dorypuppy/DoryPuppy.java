@@ -93,7 +93,7 @@ public class DoryPuppy {
         int pid = spawn(cmdArray, puppy.timeout, (puppy.directory != null) ? puppy.directory.toString() : null);
 
         if (pid <= 0) {
-            throw new IOException("error on spawn"); // fixme : uv_error
+            throw new IOException(uverror(pid));
         }
         processList.put(pid, puppy);
 
@@ -105,6 +105,6 @@ public class DoryPuppy {
      * A native method that is implemented by the 'dorypuppy' native library,
      * which is packaged with this application.
      */
-    public native String stringFromJNI();
+    public native String uverror(int r);
     private native int spawn(String[] cmdArray, long timeout, String directory);
 }

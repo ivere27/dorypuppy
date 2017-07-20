@@ -148,17 +148,13 @@ Java_io_tempage_dorypuppy_DoryPuppy_spawn(
 
 extern "C"
 JNIEXPORT jstring JNICALL
-Java_io_tempage_dorypuppy_DoryPuppy_stringFromJNI(
+Java_io_tempage_dorypuppy_DoryPuppy_uverror(
         JNIEnv *env,
-        jobject obj) {
-    std::string hello = "Hello from C++";
+        jobject obj,
+        int r) {
+    std::string s = uv_err_name(r);
+    s += ": ";
+    s += uv_strerror(r);
 
-    JNIEnv *_env;
-    jint res = jvm->GetEnv((void**)&_env, JNI_VERSION_1_6);
-    jstring jstr = _env->NewStringUTF("JNI String Test");
-    jclass clazz = _env->FindClass("io/tempage/dorypuppy/DoryPuppy");
-    jmethodID testLog = _env->GetMethodID(clazz, "test", "(Ljava/lang/String;)V");
-    _env->CallVoidMethod(obj, testLog, jstr);
-
-    return env->NewStringUTF(hello.c_str());
+    return env->NewStringUTF(s.c_str());
 }
