@@ -33,27 +33,6 @@ public class DoryPuppy {
         return Singleton.instance;
     }
 
-    public void test(byte[] array) {
-        final String s = new String(array);
-        Log.i("____________",s);
-
-        // we are in different thread.
-        // android.view.ViewRootImpl$CalledFromWrongThreadException: Only the original thread that created a view hierarchy can touch its views.
-//        Thread thread= new Thread(){
-//            @Override
-//            public void run() {
-//                runOnUiThread(new Runnable() {
-//                    public void run() {
-//                        TextView tv = (TextView) findViewById(R.id.sample_text);
-//                        tv.setText(s);
-//                    }
-//                });
-//            }
-//        };
-//        thread.start();
-    }
-
-
     // jni from c
     private void jniStdout(int pid, byte[] array) {
         final String s = new String(array);
@@ -82,6 +61,10 @@ public class DoryPuppy {
 
 
     // public
+    public void puppyKill(DoryProcess puppy, int signal) {
+        kill(puppy.pid, signal);
+    }
+
     public int puppySpawn(DoryProcess puppy) throws IOException {
         String[] cmdArray = puppy.command.toArray(new String[puppy.command.size()]);
         String[] envArray = new String[puppy.environment.size()];
@@ -112,4 +95,5 @@ public class DoryPuppy {
      */
     public native String uverror(int r);
     private native int spawn(String[] cmdArray, long timeout, String directory, String[] envArray);
+    private native void kill(int pid, int signal);
 }

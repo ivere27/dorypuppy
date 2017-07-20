@@ -118,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
                 // cal or vmstat : possibly StrictMode error // args[0] = (char *) "/system/bin/top";
                 // to test stderr :  /system/bin/cat / -> /system/bin/sh: cat: /: Is a directory
                 // to test timeout : /system/bin/top  with p.start(1000*5);
-                DoryProcess p = new DoryProcess("/system/bin/env");
+                DoryProcess p = new DoryProcess("top");
                 p.directory(new File("/"));
                 p.environment().put("TEST","ABCD");
                 try {
@@ -145,6 +145,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     });
                     Log.d("main activity", "pid : " + pid);
+                    p.kill();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

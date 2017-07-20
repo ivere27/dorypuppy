@@ -161,6 +161,18 @@ Java_io_tempage_dorypuppy_DoryPuppy_spawn(
 }
 
 extern "C"
+JNIEXPORT void JNICALL
+Java_io_tempage_dorypuppy_DoryPuppy_kill(
+        JNIEnv *env,
+        jobject obj,
+        int pid,
+        int signal) {
+
+    if (processList.count(pid))
+        processList[pid]->kill(signal);
+}
+
+extern "C"
 JNIEXPORT jstring JNICALL
 Java_io_tempage_dorypuppy_DoryPuppy_uverror(
         JNIEnv *env,

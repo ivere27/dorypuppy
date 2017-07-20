@@ -1,7 +1,5 @@
 package io.tempage.dorypuppy;
 
-import android.util.Log;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -55,6 +53,17 @@ public class DoryProcess {
         this.exitListener = listener;
         return this;
     }
+
+    public void kill(int signal) {
+        if (pid == 0)
+            return;
+
+        doryPuppy.puppyKill(this, signal);
+    }
+    public void kill() {
+        kill(9);    // default 9
+    }
+
 
     public int start(long timeout) throws  IOException {
         this.timeout = timeout;
