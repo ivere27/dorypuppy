@@ -15,8 +15,11 @@ import android.os.StrictMode;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Random;
 
+import io.tempage.dorypuppy.DoryProcess;
 import io.tempage.dorypuppy.DoryPuppy;
 
 public class MessengerService extends Service {
@@ -94,8 +97,38 @@ public class MessengerService extends Service {
             public void run() {
                 try {
                     while(true) {
-                        for (int i = 0; i<20; i++)
-                            doryPuppy.doryTest();
+                        for (int i = 0; i<20; i++) {
+                            DoryProcess p = new DoryProcess("/system/bin/top");
+                            try {
+                                Random random = new Random();
+                                final int pid = p.start(random.nextInt(10) * 1000 * 10);
+                                p.setOnExitListener(new DoryPuppy.ExitListener() {
+                                    @Override
+                                    public void listener(long code, int signal) {
+                                        Log.d("main activity", "pid : " + pid + " / " + code + " / " + signal);
+
+                                    }
+                                });
+                                p.setOnStdoutListener(new DoryPuppy.StdListener() {
+                                    @Override
+                                    public void listener(byte[] array) {
+                                        Log.d("main activity stdout", new String(array));
+
+                                    }
+                                });
+                                p.setOnStderrListener(new DoryPuppy.StdListener() {
+                                    @Override
+                                    public void listener(byte[] array) {
+                                        Log.d("main activity stderr", new String(array));
+
+                                    }
+                                });
+                                Log.d("main activity", "pid : " + pid);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
 
                         sleep(10*1000*10);
                     }

@@ -12,6 +12,7 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.os.StrictMode;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import android.widget.TextView;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -20,6 +21,11 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import java.io.IOException;
+
+import io.tempage.dorypuppy.DoryProcess;
+import io.tempage.dorypuppy.DoryPuppy;
 
 public class MainActivity extends AppCompatActivity {
 //    private static final DoryPuppy doryPuppy =  DoryPuppy.getInstance();
@@ -78,20 +84,20 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if (BuildConfig.DEBUG) {
-            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-                    .detectAll()
-                    .penaltyLog()
-                    .penaltyDropBox()
-                    .penaltyDialog()
-                    .build());
-            StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-                    .detectAll()
-                    .penaltyLog()
-                    .penaltyDropBox()
-                    //.penaltyDeath()
-                    .build());
-        }
+//        if (BuildConfig.DEBUG) {
+//            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+//                    .detectAll()
+//                    .penaltyLog()
+//                    .penaltyDropBox()
+//                    .penaltyDialog()
+//                    .build());
+//            StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+//                    .detectAll()
+//                    .penaltyLog()
+//                    .penaltyDropBox()
+//                    //.penaltyDeath()
+//                    .build());
+//        }
 
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -107,6 +113,38 @@ public class MainActivity extends AppCompatActivity {
 
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
+
+                // cal or vmstat : possibly StrictMode error // args[0] = (char *) "/system/bin/top";
+                // to test stderr :  /system/bin/cat / -> /system/bin/sh: cat: /: Is a directory
+                // to test timeout : /system/bin/top  with p.start(1000*5);
+                DoryProcess p = new DoryProcess("/system/bin/top");
+                try {
+                    final int pid = p.start(1000*5);
+                    p.setOnExitListener(new DoryPuppy.ExitListener() {
+                        @Override
+                        public void listener(long code, int signal) {
+                            Log.d("main activity", "pid : " + pid + " / " + code + " / " + signal);
+
+                        }
+                    });
+                    p.setOnStdoutListener(new DoryPuppy.StdListener() {
+                        @Override
+                        public void listener(byte[] array) {
+                            Log.d("main activity stdout", new String(array));
+
+                        }
+                    });
+                    p.setOnStderrListener(new DoryPuppy.StdListener() {
+                        @Override
+                        public void listener(byte[] array) {
+                            Log.d("main activity stderr", new String(array));
+
+                        }
+                    });
+                    Log.d("main activity", "pid : " + pid);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         });
 

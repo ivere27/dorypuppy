@@ -219,10 +219,12 @@ public:
 #ifdef __ANDROID_API__
   jobject obj = NULL;
   jclass clazz = NULL;
-  jmethodID testLog = NULL;
+  jmethodID jniStdoutCallback = NULL;
+  jmethodID jniStderrCallback = NULL;
+  jmethodID jniExitCallback = NULL;
 #endif
 
-  unsigned int timeout = 0; // forever in defaults
+  uint64_t timeout = 0; // forever in defaults
 private:
   uv_loop_t* uv_loop;
   uv_process_t process;

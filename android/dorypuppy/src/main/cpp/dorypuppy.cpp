@@ -67,28 +67,41 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
 
 extern "C"
 JNIEXPORT int JNICALL
-Java_io_tempage_dorypuppy_DoryPuppy_doryTest(
+Java_io_tempage_dorypuppy_DoryPuppy_spawn(
         JNIEnv *env,
-        jobject obj) {
+        jobject obj,
+        jobjectArray cmdArray,
+        jlong timeout = 0) {
 
     int err;
     double uptime;
     err = uv_uptime(&uptime);
     LOGI("uv_uptime: %" PRIu64, uptime);
 
-    char *args[2];
+    jint cmdSize = env->GetArrayLength(cmdArray);
+    char *args[cmdSize+1];
 
-    // cal or vmstat : possibly StrictMode error
-    args[0] = (char *) "/system/bin/top";
-    args[1] = NULL;
+    LOGI("cmdSize: %d", cmdSize);
+
+
+    for (int i=0; i<cmdSize; i++) {
+        jstring string = (jstring) (env->GetObjectArrayElement(cmdArray, i));
+        args[i] = (char *) env->GetStringUTFChars(string, 0);
+
+        LOGI("args[%d]: %s", i, args[i]);
+    }
+    args[cmdSize] = NULL;
 
     DoryProcessSpawn *process = new DoryProcessSpawn(uv_loop, args);
 
     process->obj = env->NewGlobalRef(obj);
     process->clazz = env->FindClass("io/tempage/dorypuppy/DoryPuppy");
-    process->testLog = env->GetMethodID(process->clazz, "test", "([B)V");
+    process->jniStdoutCallback = env->GetMethodID(process->clazz, "jniStdout", "(I[B)V");
+    process->jniStderrCallback = env->GetMethodID(process->clazz, "jniStderr", "(I[B)V");
+    process->jniExitCallback = env->GetMethodID(process->clazz, "jniExit", "(IJI)V");
 
-    process->timeout = rand()%(10*1000*10);
+
+    process->timeout = timeout;
     int r = process->on("timeout", []() {
         LOGI("timeout fired");
     })
@@ -98,7 +111,7 @@ Java_io_tempage_dorypuppy_DoryPuppy_doryTest(
 
         jbyteArray array = g_env->NewByteArray(nread);
         g_env->SetByteArrayRegion(array,0,nread,(jbyte*)buf);
-        g_env->CallVoidMethod(process->obj, process->testLog, array);
+        g_env->CallVoidMethod(process->obj, process->jniStdoutCallback, process->getPid(), array);
         g_env->DeleteLocalRef(array);
     })
     .on("stderr", [process](char* buf, ssize_t nread) {
@@ -107,12 +120,14 @@ Java_io_tempage_dorypuppy_DoryPuppy_doryTest(
 
         jbyteArray array = g_env->NewByteArray(nread);
         g_env->SetByteArrayRegion(array,0,nread,(jbyte*)buf);
-        g_env->CallVoidMethod(process->obj, process->testLog, array);
+        g_env->CallVoidMethod(process->obj, process->jniStderrCallback, process->getPid(), array);
         g_env->DeleteLocalRef(array);
     })
     .on("exit", [process](int64_t exitStatus, int termSignal) {
         LOGI("pid : %d, exit code : %lld , signal : %d", process->getPid(), exitStatus, termSignal);
         processList.erase(process->getPid());
+
+        g_env->CallVoidMethod(process->obj, process->jniExitCallback, process->getPid(), exitStatus, termSignal);
     })
     .spawn();
     processIndex++;
