@@ -71,7 +71,8 @@ Java_io_tempage_dorypuppy_DoryPuppy_spawn(
         JNIEnv *env,
         jobject obj,
         jobjectArray cmdArray,
-        jlong timeout = 0) {
+        jlong timeout = 0,
+        jstring cwd = nullptr) {
 
     int err;
     double uptime;
@@ -92,7 +93,7 @@ Java_io_tempage_dorypuppy_DoryPuppy_spawn(
     }
     args[cmdSize] = NULL;
 
-    DoryProcessSpawn *process = new DoryProcessSpawn(uv_loop, args);
+    DoryProcessSpawn *process = new DoryProcessSpawn(uv_loop, args, (cwd == nullptr) ? NULL : (char *)env->GetStringUTFChars(cwd, 0));
 
     process->obj = env->NewGlobalRef(obj);
     process->clazz = env->FindClass("io/tempage/dorypuppy/DoryPuppy");

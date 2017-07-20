@@ -90,7 +90,7 @@ public class DoryPuppy {
             envArray[i++] = entry.getKey() + "=" + entry.getValue();
         }
 
-        int pid = spawn(cmdArray, puppy.timeout);
+        int pid = spawn(cmdArray, puppy.timeout, (puppy.directory != null) ? puppy.directory.toString() : null);
 
         if (pid <= 0) {
             throw new IOException("error on spawn"); // fixme : uv_error
@@ -106,5 +106,5 @@ public class DoryPuppy {
      * which is packaged with this application.
      */
     public native String stringFromJNI();
-    private native int spawn(String[] cmdArray, long timeout);
+    private native int spawn(String[] cmdArray, long timeout, String directory);
 }
