@@ -90,7 +90,12 @@ public class DoryPuppy {
             envArray[i++] = entry.getKey() + "=" + entry.getValue();
         }
 
-        int pid = spawn(cmdArray, puppy.timeout, (puppy.directory != null) ? puppy.directory.toString() : null);
+        int pid = spawn(
+                cmdArray,
+                puppy.timeout,
+                (puppy.directory != null) ? puppy.directory.toString() : null,
+                (envArray.length > 0) ? envArray : null
+        );
 
         if (pid <= 0) {
             throw new IOException(uverror(pid));
@@ -106,5 +111,5 @@ public class DoryPuppy {
      * which is packaged with this application.
      */
     public native String uverror(int r);
-    private native int spawn(String[] cmdArray, long timeout, String directory);
+    private native int spawn(String[] cmdArray, long timeout, String directory, String[] envArray);
 }

@@ -137,7 +137,7 @@ public class MessengerService extends Service {
                 }
             }
         };
-        thread.start();
+        //thread.start();
     }
 
 

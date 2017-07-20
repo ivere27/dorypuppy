@@ -72,7 +72,8 @@ Java_io_tempage_dorypuppy_DoryPuppy_spawn(
         jobject obj,
         jobjectArray cmdArray,
         jlong timeout = 0,
-        jstring cwd = nullptr) {
+        jstring cwd = nullptr,
+        jobjectArray envArray = nullptr) {
 
     int err;
     double uptime;
@@ -81,19 +82,32 @@ Java_io_tempage_dorypuppy_DoryPuppy_spawn(
 
     jint cmdSize = env->GetArrayLength(cmdArray);
     char *args[cmdSize+1];
-
     LOGI("cmdSize: %d", cmdSize);
-
 
     for (int i=0; i<cmdSize; i++) {
         jstring string = (jstring) (env->GetObjectArrayElement(cmdArray, i));
         args[i] = (char *) env->GetStringUTFChars(string, 0);
-
         LOGI("args[%d]: %s", i, args[i]);
     }
     args[cmdSize] = NULL;
 
-    DoryProcessSpawn *process = new DoryProcessSpawn(uv_loop, args, (cwd == nullptr) ? NULL : (char *)env->GetStringUTFChars(cwd, 0));
+
+    jint envSize = (envArray == nullptr) ? 0 : env->GetArrayLength(envArray);
+    char *environment[envSize+1];
+    LOGI("envSize: %d", envSize);
+
+    for (int i=0; i<envSize; i++) {
+        jstring string = (jstring) (env->GetObjectArrayElement(envArray, i));
+        environment[i] = (char *) env->GetStringUTFChars(string, 0);
+        LOGI("env[%d]: %s", i, environment[i]);
+    }
+    environment[envSize] = NULL;
+
+    DoryProcessSpawn *process = new DoryProcessSpawn(
+            uv_loop,
+            args,
+            (cwd == nullptr) ? NULL : (char *)env->GetStringUTFChars(cwd, 0),
+            (envArray == nullptr) ? NULL : environment);
 
     process->obj = env->NewGlobalRef(obj);
     process->clazz = env->FindClass("io/tempage/dorypuppy/DoryPuppy");

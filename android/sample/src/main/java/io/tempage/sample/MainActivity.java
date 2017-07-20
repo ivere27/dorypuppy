@@ -118,8 +118,9 @@ public class MainActivity extends AppCompatActivity {
                 // cal or vmstat : possibly StrictMode error // args[0] = (char *) "/system/bin/top";
                 // to test stderr :  /system/bin/cat / -> /system/bin/sh: cat: /: Is a directory
                 // to test timeout : /system/bin/top  with p.start(1000*5);
-                DoryProcess p = new DoryProcess("/system/bin/ls");
-                p.directory(new File("/system/f"));
+                DoryProcess p = new DoryProcess("/system/bin/env");
+                p.directory(new File("/"));
+                p.environment().put("TEST","ABCD");
                 try {
                     final int pid = p.start(1000*5);
                     p.setOnExitListener(new DoryPuppy.ExitListener() {
