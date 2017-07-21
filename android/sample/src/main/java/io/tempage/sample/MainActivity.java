@@ -127,25 +127,22 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void listener(long code, int signal) {
                             Log.d("main activity", "pid : " + pid + " / " + code + " / " + signal);
-
                         }
                     });
                     p.setOnStdoutListener(new DoryPuppy.StdListener() {
                         @Override
                         public void listener(byte[] array) {
                             Log.d("main activity stdout", new String(array));
-
                         }
                     });
                     p.setOnStderrListener(new DoryPuppy.StdListener() {
                         @Override
                         public void listener(byte[] array) {
                             Log.d("main activity stderr", new String(array));
-
                         }
                     });
                     Log.d("main activity", "pid : " + pid);
-                    p.kill();
+                    //p.kill();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -159,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Example of a call to a native method
         TextView tv = (TextView) findViewById(R.id.sample_text);
-        tv.setText("...");  //doryPuppy.stringFromJNI()
+        tv.setText("...");
     }
 
     @Override

@@ -35,23 +35,19 @@ public class DoryPuppy {
 
     // jni from c
     private void jniStdout(int pid, byte[] array) {
-        final String s = new String(array);
-        Log.i("stdout_from_c", pid + " : " +s);
-
+        //Log.i("dorypuppy", pid + " : " + new String(array));
         if (processList.containsKey(pid) && processList.get(pid).stdoutListener != null) {
             processList.get(pid).stdoutListener.listener(array);
         }
     }
     private void jniStderr(int pid, byte[] array) {
-        final String s = new String(array);
-        Log.i("stderr_from_c", pid + " : " +s);
-
+        //Log.i("dorypuppy", pid + " : " + new String(array));
         if (processList.containsKey(pid) && processList.get(pid).stderrListener != null) {
             processList.get(pid).stderrListener.listener(array);
         }
     }
     private void jniExit(int pid, long code, int signal) {
-        Log.i("exit_from_c", pid + " : " + code + " / " + signal);
+        //Log.i("dorypuppy", pid + " : " + code + " / " + signal);
         processList.remove(pid);
 
         if (processList.containsKey(pid) && processList.get(pid).exitListener != null) {
@@ -80,19 +76,15 @@ public class DoryPuppy {
                 (envArray.length > 0) ? envArray : null
         );
 
-        if (pid <= 0) {
+        if (pid <= 0)
             throw new IOException(uverror(pid));
-        }
-        processList.put(pid, puppy);
 
+        processList.put(pid, puppy);
         return pid;
     }
 
 
-    /**
-     * A native method that is implemented by the 'dorypuppy' native library,
-     * which is packaged with this application.
-     */
+    // native functions
     public native String uverror(int r);
     private native int spawn(String[] cmdArray, long timeout, String directory, String[] envArray);
     private native void kill(int pid, int signal);
