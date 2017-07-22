@@ -118,29 +118,29 @@ public class MainActivity extends AppCompatActivity {
                 // cal or vmstat : possibly StrictMode error // args[0] = (char *) "/system/bin/top";
                 // to test stderr :  /system/bin/cat / -> /system/bin/sh: cat: /: Is a directory
                 // to test timeout : /system/bin/top  with p.start(1000*5);
-                DoryProcess p = new DoryProcess("top");
+                final DoryProcess p = new DoryProcess("top");
                 p.directory(new File("/"));
                 p.environment().put("TEST","ABCD");
+                p.setOnExitListener(new DoryPuppy.ExitListener() {
+                    @Override
+                    public void listener(long code, int signal) {
+                        Log.d("main activity", "pid : " + p.pid() + ", code : " + code + " , signal : " + signal);
+                    }
+                });
+                p.setOnStdoutListener(new DoryPuppy.StdListener() {
+                    @Override
+                    public void listener(byte[] array) {
+                        Log.d("main activity stdout", new String(array));
+                    }
+                });
+                p.setOnStderrListener(new DoryPuppy.StdListener() {
+                    @Override
+                    public void listener(byte[] array) {
+                        Log.d("main activity stderr", new String(array));
+                    }
+                });
                 try {
                     final int pid = p.start(1000*5);
-                    p.setOnExitListener(new DoryPuppy.ExitListener() {
-                        @Override
-                        public void listener(long code, int signal) {
-                            Log.d("main activity", "pid : " + pid + " / " + code + " / " + signal);
-                        }
-                    });
-                    p.setOnStdoutListener(new DoryPuppy.StdListener() {
-                        @Override
-                        public void listener(byte[] array) {
-                            Log.d("main activity stdout", new String(array));
-                        }
-                    });
-                    p.setOnStderrListener(new DoryPuppy.StdListener() {
-                        @Override
-                        public void listener(byte[] array) {
-                            Log.d("main activity stderr", new String(array));
-                        }
-                    });
                     Log.d("main activity", "pid : " + pid);
                     //p.kill();
                 } catch (IOException e) {

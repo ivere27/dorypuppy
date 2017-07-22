@@ -16,6 +16,9 @@ public class DoryProcess {
     protected int pid = 0;
     protected long timeout = 0;
 
+    protected long code;    // exitCode
+    protected int signal;   // exitSignal
+
     // listener. instead of InputOutputStream;
     protected DoryPuppy.StdListener stdoutListener, stderrListener;
     protected DoryPuppy.ExitListener exitListener;
@@ -52,6 +55,16 @@ public class DoryProcess {
     public DoryProcess setOnExitListener(DoryPuppy.ExitListener listener) {
         this.exitListener = listener;
         return this;
+    }
+
+    public int pid() {
+        return this.pid;
+    }
+    public long code() {
+        return this.code;
+    }
+    public int signal() {
+        return this.signal;
     }
 
     public void kill(int signal) {
