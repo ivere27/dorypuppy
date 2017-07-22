@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +19,9 @@ public class DoryProcess {
 
     protected long code;    // exitCode
     protected int signal;   // exitSignal
+
+    protected Date startedAt;
+    protected Date exitedAt;
 
     // listener. instead of InputOutputStream;
     protected DoryPuppy.StdListener stdoutListener, stderrListener;
@@ -60,10 +64,10 @@ public class DoryProcess {
     public int pid() {
         return this.pid;
     }
-    public long code() {
+    public long exitValue() {
         return this.code;
     }
-    public int signal() {
+    public int exitSignal() {
         return this.signal;
     }
 
