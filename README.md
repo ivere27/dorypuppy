@@ -1,11 +1,18 @@
 # dorypuppy
-event-driven process manager on Android by JNI(libuv)
+* event-driven process manager on Android by JNI(libuv)
+* shared objects are included for arm/x86
 
 ## how to use
-1. 'Import Moudle' in Android Studio (shared objects are included for arm/x86)
-2. Source directory : (git root)/android/dorypuppy
-3. add "compile project(':dorypuppy')" to dependencies{} in your build.gradle
+1 'Import Moudle' in Android Studio. Source directory : (git root)/android/dorypuppy   
+or manualy add the below code to settings.gradle(replace the path with yours)
+```java
+include ':dorypuppy'
+project(':dorypuppy').projectDir = new File(rootProject.projectDir, '../../dorypuppy/android/dorypuppy')
+```
+2. add "compile project(':dorypuppy')" to dependencies{} in your build.gradle
 
+
+## example
 ```java
 DoryProcess p = new DoryProcess("/system/bin/ls", "/system/bin"); // cmd, args...
 p.directory(new File("/system"));                   // cwd, optional
