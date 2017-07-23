@@ -10,6 +10,10 @@
 
 #include "uv.h"
 
+#ifdef __ANDROID_API__
+#include "jni.h"
+#endif
+
 namespace spawn {
 using namespace std;
 
