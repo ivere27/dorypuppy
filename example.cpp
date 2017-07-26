@@ -11,6 +11,7 @@ using namespace spawn;
 std::thread *n;
 uv_loop_t* uv_loop = uv_default_loop();
 map<int, shared_ptr<DoryProcessSpawn>> processList;
+static uv_mutex_t mutex;
 
 void loop(uv_loop_t* uv_loop) {
   uv_timer_t timer;
@@ -30,6 +31,9 @@ void loop(uv_loop_t* uv_loop) {
 
 int main() {
   //init
+  int r = uv_mutex_init(&mutex);
+  ASSERT(r == 0);
+
   n = new std::thread(loop, uv_loop);
   n->detach();
   srand(time(NULL));
@@ -68,7 +72,9 @@ int main() {
       cout << "exit code : " << exitStatus << endl;
       cout << "signal : " << termSignal << endl;
 
+      uv_mutex_lock(&mutex);
       processList.erase(process->getPid());
+      uv_mutex_unlock(&mutex);
     })
     .spawn();
 
@@ -76,8 +82,10 @@ int main() {
     if (r != 0)
       cout << uv_err_name(r) << " " << uv_strerror(r) << endl;
     else {
+      uv_mutex_lock(&mutex);
       processList[process->getPid()] = std::make_shared<DoryProcessSpawn>(*process);
       cout << "child pid : " << process->getPid() << endl;
+      uv_mutex_unlock(&mutex);
     }
   }
 
