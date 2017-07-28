@@ -24,6 +24,7 @@ using namespace spawn;
 std::thread *n = NULL;
 uv_loop_t* uv_loop = uv_default_loop();
 map<int, shared_ptr<DoryProcessSpawn>> processList;
+static uv_mutex_t mutex;
 
 JavaVM *jvm;
 JNIEnv *g_env;
@@ -57,6 +58,9 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
     }
 
     //init
+    int r = uv_mutex_init(&mutex);
+    ASSERT(r == 0);
+
     srand(time(NULL));
     n = new std::thread(loop, uv_loop);
     n->detach();
@@ -139,10 +143,14 @@ Java_io_tempage_dorypuppy_DoryPuppy_spawn(
         g_env->DeleteLocalRef(array);
     })
     .on("exit", [process](int64_t exitStatus, int termSignal) {
-        LOGI("pid : %d, exit code : %lld , signal : %d", process->getPid(), exitStatus, termSignal);
-        processList.erase(process->getPid());
+        int pid = process->getPid();
+        LOGI("pid : %d, exit code : %lld , signal : %d", pid, exitStatus, termSignal);
 
-        g_env->CallVoidMethod(process->obj, process->jniExitCallback, process->getPid(), exitStatus, termSignal);
+        g_env->CallVoidMethod(process->obj, process->jniExitCallback, pid, exitStatus, termSignal);
+
+        uv_mutex_lock(&mutex);
+        processList.erase(pid);
+        uv_mutex_unlock(&mutex);
     })
     .spawn();
     processIndex++;
@@ -154,10 +162,14 @@ Java_io_tempage_dorypuppy_DoryPuppy_spawn(
         return r;
     }
 
-    processList[process->getPid()] = std::make_shared<DoryProcessSpawn>(*process);
-    LOGI("child pid : %d", process->getPid());
+    int pid = process->getPid();
+    LOGI("child pid : %d", pid);
 
-    return process->getPid();
+    uv_mutex_lock(&mutex);
+    processList[pid] = std::make_shared<DoryProcessSpawn>(*process);
+    uv_mutex_unlock(&mutex);
+
+    return pid;
 }
 
 extern "C"
