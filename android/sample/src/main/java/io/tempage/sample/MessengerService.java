@@ -34,7 +34,6 @@ public class MessengerService extends Service {
     static final int MSG_INIT = 4;
     static final int MSG_STDOUT = 5;
 
-    private static final DoryPuppy doryPuppy =  DoryPuppy.getInstance();
     Thread thread = null;
 
     class IncomingHandler extends Handler {

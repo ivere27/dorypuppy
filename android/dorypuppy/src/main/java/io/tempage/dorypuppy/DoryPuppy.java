@@ -4,6 +4,7 @@ import android.util.Log;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
@@ -52,6 +53,7 @@ public class DoryPuppy {
         if (processList.containsKey(pid)) {
             processList.get(pid).code = code;
             processList.get(pid).signal = signal;
+            processList.get(pid).exitedAt =  new Date();
 
             if (processList.get(pid).exitListener != null)
                 processList.get(pid).exitListener.listener(code, signal);

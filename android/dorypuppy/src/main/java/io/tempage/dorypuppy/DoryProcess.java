@@ -70,6 +70,12 @@ public class DoryProcess {
     public int exitSignal() {
         return this.signal;
     }
+    public boolean isRunning() {
+        if (this.pid != 0 && this.exitedAt == null)
+            return true;
+
+        return false;
+    }
 
     public void kill(int signal) {
         if (pid == 0)
@@ -85,6 +91,7 @@ public class DoryProcess {
     public int start(long timeout) throws  IOException {
         this.timeout = timeout;
         this.pid = doryPuppy.puppySpawn(this);
+        this.startedAt =  new Date();
         return pid;
     }
     public int start() throws IOException {
