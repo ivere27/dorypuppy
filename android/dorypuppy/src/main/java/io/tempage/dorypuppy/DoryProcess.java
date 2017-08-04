@@ -49,15 +49,18 @@ public class DoryProcess {
     }
 
     public DoryProcess setOnStdoutListener(DoryPuppy.StdListener listener) {
-        this.stdoutListener = listener;
+        if (listener != null)
+            this.stdoutListener = listener;
         return this;
     }
     public DoryProcess setOnStderrListener(DoryPuppy.StdListener listener) {
-        this.stderrListener = listener;
+        if (listener != null)
+            this.stderrListener = listener;
         return this;
     }
     public DoryProcess setOnExitListener(DoryPuppy.ExitListener listener) {
-        this.exitListener = listener;
+        if (listener != null)
+            this.exitListener = listener;
         return this;
     }
 
