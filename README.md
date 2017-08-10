@@ -10,7 +10,7 @@ include ':dorypuppy'
 project(':dorypuppy').projectDir = new File(rootProject.projectDir, '../../dorypuppy/android/dorypuppy')
 ```
 2. add "compile project(':dorypuppy')" to dependencies{} in your build.gradle
-
+3. set "release { minifyEnabled false" to buildTypes{} in build.gradle
 
 ## example
 ```java
