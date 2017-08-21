@@ -21,7 +21,7 @@ public class DoryPuppy {
         void listener(byte[] array);
     }
     public interface ExitListener {
-        void listener(long code, int signal);
+        void listener(int pid, long code, int signal);
     }
 
     private DoryPuppy() {
@@ -56,7 +56,7 @@ public class DoryPuppy {
             processList.get(pid).exitedAt =  new Date();
 
             if (processList.get(pid).exitListener != null)
-                processList.get(pid).exitListener.listener(code, signal);
+                processList.get(pid).exitListener.listener(pid, code, signal);
         }
 
         processList.remove(pid);
