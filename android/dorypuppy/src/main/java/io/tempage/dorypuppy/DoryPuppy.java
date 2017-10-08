@@ -23,6 +23,9 @@ public class DoryPuppy {
     public interface ExitListener {
         void listener(int pid, long code, int signal);
     }
+    public interface TimeoutListener {
+        void listener(int pid);
+    }
 
     private DoryPuppy() {
         this.processList = new Hashtable<Integer, DoryProcess>();
@@ -60,6 +63,14 @@ public class DoryPuppy {
         }
 
         processList.remove(pid);
+    }
+    private void jniTimeout(int pid) {
+        //Log.i("dorypuppy", pid);
+
+        if (processList.containsKey(pid)) {
+            if (processList.get(pid).timeoutListener != null)
+                processList.get(pid).timeoutListener.listener(pid);
+        }
     }
 
 

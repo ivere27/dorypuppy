@@ -26,6 +26,8 @@ public class DoryProcess {
     // listener. instead of InputOutputStream;
     protected DoryPuppy.StdListener stdoutListener, stderrListener;
     protected DoryPuppy.ExitListener exitListener;
+    protected DoryPuppy.TimeoutListener timeoutListener;
+
 
     public DoryProcess(String... command) {
         this(new ArrayList<String>(Arrays.asList(command)));
@@ -61,6 +63,11 @@ public class DoryProcess {
     public DoryProcess setOnExitListener(DoryPuppy.ExitListener listener) {
         if (listener != null)
             this.exitListener = listener;
+        return this;
+    }
+    public DoryProcess setOnTimeoutListener(DoryPuppy.TimeoutListener listener) {
+        if (listener != null)
+            this.timeoutListener = listener;
         return this;
     }
 

@@ -226,6 +226,7 @@ public:
   jmethodID jniStdoutCallback = NULL;
   jmethodID jniStderrCallback = NULL;
   jmethodID jniExitCallback = NULL;
+  jmethodID jniTimeoutCallback = NULL;
 #endif
 
   uint64_t timeout = 0; // forever in defaults

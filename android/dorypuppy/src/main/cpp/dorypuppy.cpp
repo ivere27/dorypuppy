@@ -118,11 +118,14 @@ Java_io_tempage_dorypuppy_DoryPuppy_spawn(
     process->jniStdoutCallback = env->GetMethodID(process->clazz, "jniStdout", "(I[B)V");
     process->jniStderrCallback = env->GetMethodID(process->clazz, "jniStderr", "(I[B)V");
     process->jniExitCallback = env->GetMethodID(process->clazz, "jniExit", "(IJI)V");
+    process->jniTimeoutCallback = env->GetMethodID(process->clazz, "jniTimeout", "(I)V");
 
 
     process->timeout = timeout;
-    int r = process->on("timeout", []() {
+    int r = process->on("timeout", [process]() {
         LOGI("timeout fired");
+        int pid = process->getPid();
+        g_env->CallVoidMethod(process->obj, process->jniTimeoutCallback, pid);
     })
     .on("stdout", [process](char* buf, ssize_t nread) {
         //std::string str(buf, nread);
