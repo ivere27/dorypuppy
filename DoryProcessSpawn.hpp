@@ -157,9 +157,8 @@ public:
         DoryProcessSpawn *child = (DoryProcessSpawn*)timer->data;
         child->_clearTimer();
 
-        uv_process_kill(&child->process, SIGKILL);
-
         child->emit("timeout");
+        uv_process_kill(&child->process, SIGKILL);
       }, timeout, 0);
       ASSERT(r == 0);
     }
