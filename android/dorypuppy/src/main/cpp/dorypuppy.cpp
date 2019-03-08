@@ -24,7 +24,7 @@ using namespace spawn;
 std::thread *n = NULL;
 uv_loop_t* uv_loop = uv_default_loop();
 map<int, shared_ptr<DoryProcessSpawn>> processList;
-static uv_mutex_t mutex;
+static uv_mutex_t uvMutex;
 
 JavaVM *jvm;
 JNIEnv *g_env;
@@ -58,7 +58,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void* reserved) {
     }
 
     //init
-    int r = uv_mutex_init(&mutex);
+    int r = uv_mutex_init(&uvMutex);
     ASSERT(r == 0);
 
     srand(time(NULL));
@@ -151,9 +151,9 @@ Java_io_tempage_dorypuppy_DoryPuppy_spawn(
 
         g_env->CallVoidMethod(process->obj, process->jniExitCallback, pid, exitStatus, termSignal);
 
-        uv_mutex_lock(&mutex);
+        uv_mutex_lock(&uvMutex);
         processList.erase(pid);
-        uv_mutex_unlock(&mutex);
+        uv_mutex_unlock(&uvMutex);
     })
     .spawn();
     processIndex++;
@@ -168,9 +168,9 @@ Java_io_tempage_dorypuppy_DoryPuppy_spawn(
     int pid = process->getPid();
     LOGI("child pid : %d", pid);
 
-    uv_mutex_lock(&mutex);
+    uv_mutex_lock(&uvMutex);
     processList[pid] = std::make_shared<DoryProcessSpawn>(*process);
-    uv_mutex_unlock(&mutex);
+    uv_mutex_unlock(&uvMutex);
 
     return pid;
 }
