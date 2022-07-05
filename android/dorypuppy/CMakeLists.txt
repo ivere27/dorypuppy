@@ -19,6 +19,8 @@ add_library( # Sets the name of the library.
              # Provides a relative path to your source file(s).
              src/main/cpp/dorypuppy.cpp )
 
+include_directories(src/main/cpp/)
+
 set(prebuilt_DIR ${CMAKE_SOURCE_DIR}/libs)
 add_library(libuv SHARED IMPORTED)
 set_target_properties(libuv PROPERTIES IMPORTED_LOCATION

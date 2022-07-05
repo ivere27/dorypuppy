@@ -1,6 +1,6 @@
 # dorypuppy
 * event-driven process manager on Android by JNI(libuv)
-* shared objects are included for arm/x86
+* shared objects are included for arm64
 
 ## how to use
 1 'Import Moudle' in Android Studio. Source directory : (git root)/android/dorypuppy   
